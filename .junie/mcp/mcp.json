@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/opt/homebrew/Cellar/php/8.4.12/bin/php",
+            "args": [
+                "/Users/fikrimastor/Sites/fikrimastor/memory-library/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
