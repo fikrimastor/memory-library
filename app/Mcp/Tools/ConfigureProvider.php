@@ -11,7 +11,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
-class ConfigureProviderTool extends Tool
+class ConfigureProvider extends Tool
 {
     /**
      * The tool's description.

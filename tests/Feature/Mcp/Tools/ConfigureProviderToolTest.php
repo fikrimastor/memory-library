@@ -1,6 +1,6 @@
 <?php
 
-use App\Mcp\Tools\ConfigureProviderTool;
+use App\Mcp\Tools\ConfigureProvider;
 use App\Models\ProviderHealth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Mcp\Request;
@@ -21,7 +21,7 @@ beforeEach(function () {
 });
 
 test('it can get configuration and health status through MCP tool', function () {
-    $tool = app(ConfigureProviderTool::class);
+    $tool = app(ConfigureProvider::class);
     
     $params = [];
     
@@ -37,7 +37,7 @@ test('it can get configuration and health status through MCP tool', function () 
 });
 
 test('it can perform health check through MCP tool', function () {
-    $tool = app(ConfigureProviderTool::class);
+    $tool = app(ConfigureProvider::class);
     
     $params = [
         'health_check' => true
@@ -53,7 +53,7 @@ test('it can perform health check through MCP tool', function () {
 });
 
 test('it can test a specific provider through MCP tool', function () {
-    $tool = app(ConfigureProviderTool::class);
+    $tool = app(ConfigureProvider::class);
     
     $params = [
         'test_provider' => true,

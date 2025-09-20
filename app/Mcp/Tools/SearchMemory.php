@@ -10,7 +10,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
-class SearchMemoryTool extends Tool
+class SearchMemory extends Tool
 {
     /**
      * The tool's description.

@@ -1,6 +1,6 @@
 <?php
 
-use App\Mcp\Tools\SearchMemoryTool;
+use App\Mcp\Tools\SearchMemory;
 use App\Models\User;
 use App\Models\UserMemory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,7 +36,7 @@ beforeEach(function () {
 });
 
 test('it can search memories through MCP tool', function () {
-    $tool = app(SearchMemoryTool::class);
+    $tool = app(SearchMemory::class);
     
     $params = [
         'user_id' => $this->user->id,
@@ -62,7 +62,7 @@ test('it can search memories through MCP tool', function () {
 });
 
 test('it returns error when query is missing', function () {
-    $tool = app(SearchMemoryTool::class);
+    $tool = app(SearchMemory::class);
     
     $params = [
         'user_id' => $this->user->id
@@ -79,7 +79,7 @@ test('it returns error when query is missing', function () {
 });
 
 test('it can search with different parameters', function () {
-    $tool = app(SearchMemoryTool::class);
+    $tool = app(SearchMemory::class);
     
     $params = [
         'user_id' => $this->user->id,

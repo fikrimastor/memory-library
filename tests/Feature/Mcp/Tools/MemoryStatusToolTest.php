@@ -1,6 +1,6 @@
 <?php
 
-use App\Mcp\Tools\MemoryStatusTool;
+use App\Mcp\Tools\MemoryStatus;
 use App\Models\EmbeddingJob;
 use App\Models\ProviderHealth;
 use App\Models\User;
@@ -50,7 +50,7 @@ beforeEach(function () {
 });
 
 test('it can get memory status through MCP tool', function () {
-    $tool = app(MemoryStatusTool::class);
+    $tool = app(MemoryStatus::class);
     
     $params = [
         'user_id' => $this->user->id

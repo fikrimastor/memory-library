@@ -11,7 +11,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
-class AddToMemoryTool extends Tool
+class AddToMemory extends Tool
 {
     /**
      * The tool's description.

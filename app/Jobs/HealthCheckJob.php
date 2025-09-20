@@ -28,8 +28,7 @@ class HealthCheckJob implements ShouldQueue
      */
     public function __construct()
     {
-        // Set the queue for this job
-        $this->onQueue('default');
+        //
     }
 
     /**

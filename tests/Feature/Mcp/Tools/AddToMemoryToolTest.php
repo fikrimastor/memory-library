@@ -1,6 +1,6 @@
 <?php
 
-use App\Mcp\Tools\AddToMemoryTool;
+use App\Mcp\Tools\AddToMemory;
 use App\Models\EmbeddingJob;
 use App\Models\User;
 use App\Models\UserMemory;
@@ -15,7 +15,7 @@ beforeEach(function () {
 });
 
 test('it can add memory through MCP tool', function () {
-    $tool = app(AddToMemoryTool::class);
+    $tool = app(AddToMemory::class);
     
     $params = [
         'user_id' => $this->user->id,
@@ -45,7 +45,7 @@ test('it can add memory through MCP tool', function () {
 });
 
 test('it can add memory with embedding generation', function () {
-    $tool = app(AddToMemoryTool::class);
+    $tool = app(AddToMemory::class);
     
     $params = [
         'user_id' => $this->user->id,
@@ -72,7 +72,7 @@ test('it can add memory with embedding generation', function () {
 });
 
 test('it returns error when content is missing', function () {
-    $tool = app(AddToMemoryTool::class);
+    $tool = app(AddToMemory::class);
     
     $params = [
         'user_id' => $this->user->id,

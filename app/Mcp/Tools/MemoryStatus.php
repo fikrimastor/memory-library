@@ -12,7 +12,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
 use Throwable;
 
-class MemoryStatusTool extends Tool
+class MemoryStatus extends Tool
 {
     /**
      * The tool's description.
