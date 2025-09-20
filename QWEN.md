@@ -1,6 +1,6 @@
-# CLAUDE.md
+# QWEN.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Qwen Code when working with code in this repository.
 
 ## Project Overview
 
@@ -392,11 +392,11 @@ Route::get('/users', function () {
 - Tests should test all of the happy paths, failure paths, and weird paths.
 - Tests live in the `tests/Feature` and `tests/Unit` directories.
 - Pest tests look and behave like this:
-<code-snippet name="Basic Pest Test Example" lang="php">
-it('is true', function () {
-    expect(true)->toBeTrue();
-});
-</code-snippet>
+  <code-snippet name="Basic Pest Test Example" lang="php">
+  it('is true', function () {
+  expect(true)->toBeTrue();
+  });
+  </code-snippet>
 
 ### Running Tests
 - Run the minimal number of tests using an appropriate filter before finalizing code edits.
@@ -407,13 +407,13 @@ it('is true', function () {
 
 ### Pest Assertions
 - When asserting status codes on a response, use the specific method like `assertForbidden` and `assertNotFound` instead of using `assertStatus(403)` or similar, e.g.:
-<code-snippet name="Pest Example Asserting postJson Response" lang="php">
-it('returns all', function () {
-    $response = $this->postJson('/api/docs', []);
+  <code-snippet name="Pest Example Asserting postJson Response" lang="php">
+  it('returns all', function () {
+  $response = $this->postJson('/api/docs', []);
 
-    $response->assertSuccessful();
-});
-</code-snippet>
+  $response->assertSuccessful();
+  });
+  </code-snippet>
 
 ### Mocking
 - Mocking can be very helpful when appropriate.
@@ -631,7 +631,7 @@ namespace App\Actions;
 
 final class CreateFavorite
 {
-    public function __construct(protected FavoriteApi $fav) {}
+public function __construct(protected FavoriteApi $fav) {}
 
     public function handle(User $user, string $favorite): bool
     {
