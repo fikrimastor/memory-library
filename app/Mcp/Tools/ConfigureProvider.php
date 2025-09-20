@@ -83,10 +83,10 @@ class ConfigureProvider extends Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'configure' => $schema->boolean()->description('Whether to configure the provider')->required(false),
-            'health_check' => $schema->boolean()->description('Whether to perform a health check')->required(false),
-            'test_provider' => $schema->boolean()->description('Whether to test a provider')->required(false),
-            'provider_name' => $schema->string()->description('The name of the provider to test')->required(false),
+            'configure' => $schema->boolean()->description('Whether to configure the provider'),
+            'health_check' => $schema->boolean()->description('Whether to perform a health check'),
+            'test_provider' => $schema->boolean()->description('Whether to test a provider'),
+            'provider_name' => $schema->string()->description('The name of the provider to test'),
         ];
     }
 }

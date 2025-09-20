@@ -25,8 +25,7 @@ class MemoryStatus extends Tool
     public function handle(Request $request): Response
     {
         try {
-            $params = $request->all();
-            $userId = $params['user_id'] ?? Auth::id();
+            $userId = Auth::id();
 
             // Get memory statistics
             $memoryCount = UserMemory::where('user_id', $userId)->count();
@@ -79,7 +78,7 @@ class MemoryStatus extends Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'user_id' => $schema->integer()->description('The user ID to get status for')->required(false),
+            //
         ];
     }
 }

@@ -38,14 +38,13 @@ class SearchMemory extends Tool
 
             $action = app(SearchMemoryAction::class);
 
-            $userId = $params['user_id'] ?? Auth::id();
             $limit = $params['limit'] ?? 10;
             $threshold = $params['threshold'] ?? 0.7;
-            $useEmbedding = $params['use_embedding'] ?? $params['useEmbedding'] ?? true;
-            $fallbackToDatabase = $params['fallback_to_database'] ?? $params['fallbackToDatabase'] ?? true;
+            $useEmbedding = $params['use_embedding'] ?? true;
+            $fallbackToDatabase = $params['fallback_to_database'] ?? true;
 
             $results = $action->handle(
-                userId: $userId,
+                userId: Auth::id(),
                 query: $query,
                 limit: $limit,
                 threshold: $threshold,
@@ -76,13 +75,10 @@ class SearchMemory extends Tool
     {
         return [
             'query' => $schema->string()->description('The search query')->required(),
-            'user_id' => $schema->integer()->description('The user ID to search for memories')->required(false),
-            'limit' => $schema->integer()->description('Maximum number of results to return')->required(false),
-            'threshold' => $schema->number()->description('Similarity threshold for vector search')->required(false),
-            'use_embedding' => $schema->boolean()->description('Whether to use embedding search')->required(false),
-            'useEmbedding' => $schema->boolean()->description('Whether to use embedding search (alternative parameter name)')->required(false),
-            'fallback_to_database' => $schema->boolean()->description('Whether to fallback to database search')->required(false),
-            'fallbackToDatabase' => $schema->boolean()->description('Whether to fallback to database search (alternative parameter name)')->required(false),
+            'limit' => $schema->integer()->description('Maximum number of results to return'),
+            'threshold' => $schema->number()->description('Similarity threshold for vector search'),
+            'use_embedding' => $schema->boolean()->description('Whether to use embedding search'),
+            'fallback_to_database' => $schema->boolean()->description('Whether to fallback to database search')->required(),
         ];
     }
 }
