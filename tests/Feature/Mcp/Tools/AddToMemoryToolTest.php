@@ -5,6 +5,7 @@ use App\Models\EmbeddingJob;
 use App\Models\User;
 use App\Models\UserMemory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Mcp\Request;
 
 uses(RefreshDatabase::class);
 
@@ -26,7 +27,10 @@ test('it can add memory through MCP tool', function () {
         'generate_embedding' => false
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     expect($result['memory_id'])->toBeInt();
@@ -53,7 +57,10 @@ test('it can add memory with embedding generation', function () {
         'generate_embedding' => true
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     expect($result['memory_id'])->toBeInt();
@@ -75,7 +82,10 @@ test('it returns error when content is missing', function () {
         'document_type' => 'Memory'
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeFalse();
     expect($result['error'])->toBeString();

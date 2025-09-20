@@ -4,6 +4,7 @@ use App\Mcp\Tools\SearchMemoryTool;
 use App\Models\User;
 use App\Models\UserMemory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Mcp\Request;
 
 uses(RefreshDatabase::class);
 
@@ -42,7 +43,10 @@ test('it can search memories through MCP tool', function () {
         'query' => 'Laravel'
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     expect($result['total'])->toBeGreaterThan(0);
@@ -64,7 +68,10 @@ test('it returns error when query is missing', function () {
         'user_id' => $this->user->id
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeFalse();
     expect($result['error'])->toBeString();
@@ -82,7 +89,10 @@ test('it can search with different parameters', function () {
         'use_embedding' => false
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     expect($result['limit'])->toBe(5);

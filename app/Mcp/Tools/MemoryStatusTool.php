@@ -1,26 +1,31 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Mcp\Tools;
 
 use App\Models\EmbeddingJob;
 use App\Models\ProviderHealth;
 use App\Models\UserMemory;
+use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Mcp\Request;
+use Laravel\Mcp\Response;
+use Laravel\Mcp\Server\Tool;
 use Throwable;
 
-class MemoryStatusTool
+class MemoryStatusTool extends Tool
 {
     /**
-     * Get status information about user's memory library and provider health.
-     *
-     * @param  array  $params  Tool parameters
-     * @return array Response
+     * The tool's description.
      */
-    public function handle(array $params): array
+    protected string $description = 'Get status information about user\'s memory library and provider health.';
+
+    /**
+     * Handle the tool request.
+     */
+    public function handle(Request $request): Response
     {
         try {
+            $params = $request->all();
             $userId = $params['user_id'] ?? Auth::id();
 
             // Get memory statistics
@@ -60,7 +65,7 @@ class MemoryStatusTool
             $completedJobs = EmbeddingJob::where('status', 'completed')->count();
             $failedJobs = EmbeddingJob::where('status', 'failed')->count();
 
-            return [
+            return Response::json([
                 'success' => true,
                 'memory_stats' => [
                     'total_count' => $memoryCount,
@@ -76,13 +81,25 @@ class MemoryStatusTool
                     'failed' => $failedJobs,
                 ],
                 'message' => 'Status retrieved successfully',
-            ];
+            ]);
         } catch (Throwable $e) {
-            return [
+            return Response::json([
                 'success' => false,
                 'error' => $e->getMessage(),
                 'message' => 'Failed to retrieve status',
-            ];
+            ]);
         }
+    }
+
+    /**
+     * Get the tool's input schema.
+     *
+     * @return array<string, \Illuminate\JsonSchema\JsonSchema>
+     */
+    public function schema(JsonSchema $schema): array
+    {
+        return [
+            'user_id' => $schema->integer()->description('The user ID to get status for')->required(false),
+        ];
     }
 }

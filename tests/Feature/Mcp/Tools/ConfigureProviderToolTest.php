@@ -3,6 +3,7 @@
 use App\Mcp\Tools\ConfigureProviderTool;
 use App\Models\ProviderHealth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Mcp\Request;
 
 uses(RefreshDatabase::class);
 
@@ -24,11 +25,15 @@ test('it can get configuration and health status through MCP tool', function () 
     
     $params = [];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     expect($result['configuration'])->toBeArray();
-    expect($result['provider_health'])->toBeInstanceOf(\Illuminate\Database\Eloquent\Collection::class);
+    expect($result['provider_health'])->toBeArray();
+    expect(count($result['provider_health']))->toBe(2);
 });
 
 test('it can perform health check through MCP tool', function () {
@@ -38,7 +43,10 @@ test('it can perform health check through MCP tool', function () {
         'health_check' => true
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     expect($result['health_status'])->toBeArray();
@@ -52,7 +60,10 @@ test('it can test a specific provider through MCP tool', function () {
         'provider_name' => 'openai'
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     expect($result['provider_test'])->toBeArray();

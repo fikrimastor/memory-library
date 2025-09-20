@@ -6,6 +6,7 @@ use App\Models\ProviderHealth;
 use App\Models\User;
 use App\Models\UserMemory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Mcp\Request;
 
 uses(RefreshDatabase::class);
 
@@ -55,14 +56,17 @@ test('it can get memory status through MCP tool', function () {
         'user_id' => $this->user->id
     ];
     
-    $result = $tool->handle($params);
+    $request = new Request($params);
+    $response = $tool->handle($request);
+    $content = $response->content();
+    $result = json_decode((string) $content, true);
     
     expect($result['success'])->toBeTrue();
     
     // Check memory stats
     expect($result['memory_stats'])->toBeArray();
     expect($result['memory_stats']['total_count'])->toBe(5);
-    expect($result['memory_stats']['recent_memories'])->toBeInstanceOf(\Illuminate\Database\Eloquent\Collection::class);
+    expect($result['memory_stats']['recent_memories'])->toBeArray();
     expect($result['memory_stats']['by_document_type'])->toBeArray();
     
     // Check that we have the expected document types
@@ -70,8 +74,8 @@ test('it can get memory status through MCP tool', function () {
     expect($result['memory_stats']['by_document_type'])->toHaveKey('Document');
     
     // Check provider health
-    expect($result['provider_health'])->toBeInstanceOf(\Illuminate\Database\Eloquent\Collection::class);
-    expect($result['provider_health'])->toHaveCount(2);
+    expect($result['provider_health'])->toBeArray();
+    expect(count($result['provider_health']))->toBe(2);
     
     // Check embedding jobs
     expect($result['embedding_jobs'])->toBeArray();
