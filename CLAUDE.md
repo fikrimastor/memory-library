@@ -151,7 +151,6 @@ npm run build:ssr
 ===
 
 <laravel-boost-guidelines>
-
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -494,13 +493,10 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 - Use `router.visit()` or `<Link>` for navigation instead of traditional links.
 
 <code-snippet name="Inertia Client Navigation" lang="vue">
-<template>
-  <Link href="/">Home</Link>
-</template>
 
-<script setup>
-import { Link } from '@inertiajs/vue3'
-</script>
+    import { Link } from '@inertiajs/vue3'
+    <Link href="/">Home</Link>
+
 </code-snippet>
 
 
@@ -509,43 +505,39 @@ import { Link } from '@inertiajs/vue3'
 ## Inertia + Vue Forms
 
 <code-snippet name="`<Form>` Component Example" lang="vue">
-<template>
-  <Form
+
+<Form
     action="/users"
     method="post"
     #default="{
-      errors,
-      hasErrors,
-      processing,
-      progress,
-      wasSuccessful,
-      recentlySuccessful,
-      setError,
-      clearErrors,
-      resetAndClearErrors,
-      defaults,
-      isDirty,
-      reset,
-      submit,
-    }"
-  >
+        errors,
+        hasErrors,
+        processing,
+        progress,
+        wasSuccessful,
+        recentlySuccessful,
+        setError,
+        clearErrors,
+        resetAndClearErrors,
+        defaults,
+        isDirty,
+        reset,
+        submit,
+  }"
+>
     <input type="text" name="name" />
 
     <div v-if="errors.name">
-      {{ errors.name }}
+        {{ errors.name }}
     </div>
 
     <button type="submit" :disabled="processing">
-      {{ processing ? 'Creating...' : 'Create User' }}
+        {{ processing ? 'Creating...' : 'Create User' }}
     </button>
 
     <div v-if="wasSuccessful">User created successfully!</div>
-  </Form>
-</template>
+</Form>
 
-<script setup>
-import { Form } from '@inertiajs/vue3'
-</script>
 </code-snippet>
 
 
@@ -561,13 +553,13 @@ import { Form } from '@inertiajs/vue3'
 ### Spacing
 - When listing items, use gap utilities for spacing, don't use margins.
 
-<code-snippet name="Valid Flex Gap Spacing Example" lang="html">
-<div class="flex gap-8">
-  <div>Superior</div>
-  <div>Michigan</div>
-  <div>Erie</div>
-</div>
-</code-snippet>
+    <code-snippet name="Valid Flex Gap Spacing Example" lang="html">
+        <div class="flex gap-8">
+            <div>Superior</div>
+            <div>Michigan</div>
+            <div>Erie</div>
+        </div>
+    </code-snippet>
 
 
 ### Dark Mode
@@ -632,19 +624,20 @@ import { Form } from '@inertiajs/vue3'
 - `handle()` should always have a non-void return type.
 
 <code-snippet name="Example action class" lang="php">
+
 <?php
 declare(strict_types=1);
 
 namespace App\Actions;
 
-final class CreateFavorite
-{
-    public function __construct(protected FavoriteApi $fav) {}
+final class CreateFavorite {
+    public function __construct(protected FavoriteApi $fav) { }
 
     public function handle(User $user, string $favorite): bool
     {
         return $this->fav->add($user, $favorite);
     }
 }
+
 </code-snippet>
 </laravel-boost-guidelines>
