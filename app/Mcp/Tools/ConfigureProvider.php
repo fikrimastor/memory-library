@@ -32,11 +32,7 @@ class ConfigureProvider extends Tool
                 // For now, we'll just return the current configuration
                 $config = config('embedding');
 
-                return Response::json([
-                    'success' => true,
-                    'configuration' => $config,
-                    'message' => 'Configuration retrieved successfully',
-                ]);
+                return Response::text('Configuration retrieved successfully');
             }
 
             // If it's a health check request
@@ -44,11 +40,7 @@ class ConfigureProvider extends Tool
                 $action = app(HealthCheckAction::class);
                 $results = $action->handle();
 
-                return Response::json([
-                    'success' => true,
-                    'health_status' => $results,
-                    'message' => 'Health check completed successfully',
-                ]);
+                return Response::text('Health check completed successfully');
             }
             
             // If it's a provider test request
@@ -67,21 +59,9 @@ class ConfigureProvider extends Tool
                         $testEmbedding = $driver->embed('test');
                     }
                     
-                    return Response::json([
-                        'success' => true,
-                        'provider_test' => [
-                            'provider' => $providerName,
-                            'healthy' => $isHealthy,
-                            'test_embedding_generated' => $testEmbedding !== null,
-                        ],
-                        'message' => $isHealthy ? 'Provider test completed successfully' : 'Provider is not healthy',
-                    ]);
+                    return Response::text($isHealthy ? 'Provider test completed successfully' : 'Provider is not healthy');
                 } catch (\Exception $e) {
-                    return Response::json([
-                        'success' => false,
-                        'error' => $e->getMessage(),
-                        'message' => 'Failed to test provider',
-                    ]);
+                    return Response::text('Failed to test provider: ' . $e->getMessage());
                 }
             }
 
@@ -89,18 +69,9 @@ class ConfigureProvider extends Tool
             $config = config('embedding');
             $providerHealth = ProviderHealth::all();
 
-            return Response::json([
-                'success' => true,
-                'configuration' => $config,
-                'provider_health' => $providerHealth,
-                'message' => 'Configuration and health status retrieved successfully',
-            ]);
+            return Response::text('Configuration and health status retrieved successfully');
         } catch (Throwable $e) {
-            return Response::json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'message' => 'Failed to configure provider',
-            ]);
+            return Response::text('Failed to configure provider: ' . $e->getMessage());
         }
     }
 

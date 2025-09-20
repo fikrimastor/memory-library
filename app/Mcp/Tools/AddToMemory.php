@@ -33,56 +33,30 @@ class AddToMemory extends Tool
     public function handle(Request $request): Response
     {
         try {
-            $params = $request->all();
+            $params = $request->validate([
+                'thing_to_remember' => 'required|string'
+            ]);
 
             // Validate required parameters
-            $content = $params['content'] ?? $params['thingToRemember'] ?? null;
+            $content = $params['thing_to_remember'];
             if (empty($content)) {
-                return Response::json([
-                    'success' => false,
-                    'error' => 'Content is required',
-                    'message' => 'Failed to add memory: content is required',
-                ]);
+                return Response::text('Failed to add memory: content is required');
             }
 
             $action = app(AddToMemoryAction::class);
-            
-            $userId = $params['user_id'] ?? Auth::id();
-            $generateEmbedding = $params['generate_embedding'] ?? $params['generateEmbedding'] ?? true;
 
             $memory = $action->handle(
-                userId: $userId,
+                userId: Auth::id(),
                 content: $content,
                 metadata: $params['metadata'] ?? [],
                 tags: $params['tags'] ?? [],
-                projectName: $params['project_name'] ?? $params['projectName'] ?? null,
-                documentType: $params['document_type'] ?? $params['documentType'] ?? 'Memory',
-                generateEmbedding: $generateEmbedding
+                projectName: $params['project_name'] ?? null,
+                documentType: $params['document_type'] ?? 'Memory'
             );
 
-            // Check if embedding job was requested
-            $embeddingQueued = $generateEmbedding;
-            $embeddingJobId = null;
-            
-            // If embedding was requested, try to find the job record
-            if ($generateEmbedding) {
-                $embeddingJob = EmbeddingJob::where('memory_id', $memory->id)->first();
-                $embeddingJobId = $embeddingJob?->id;
-            }
-
-            return Response::json([
-                'success' => true,
-                'memory_id' => $memory->id,
-                'embedding_queued' => $embeddingQueued,
-                'embedding_job_id' => $embeddingJobId,
-                'message' => 'Memory added successfully',
-            ]);
+            return Response::text("Memory added successfully. Memory ID: {$memory->id}");
         } catch (Throwable $e) {
-            return Response::json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'message' => 'Failed to add memory',
-            ]);
+            return Response::text('Failed to add memory: ' . $e->getMessage());
         }
     }
 
@@ -94,17 +68,11 @@ class AddToMemory extends Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'content' => $schema->string()->description('The content to remember')->required(false),
-            'thingToRemember' => $schema->string()->description('The content to remember (alternative parameter name)')->required(false),
-            'user_id' => $schema->integer()->description('The user ID to associate with the memory')->required(false),
-            'generate_embedding' => $schema->boolean()->description('Whether to generate an embedding for the memory')->required(false),
-            'generateEmbedding' => $schema->boolean()->description('Whether to generate an embedding for the memory (alternative parameter name)')->required(false),
-            'metadata' => $schema->object()->description('Additional metadata to store with the memory')->required(false),
-            'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory')->required(false),
-            'project_name' => $schema->string()->description('The project name to associate with the memory')->required(false),
-            'projectName' => $schema->string()->description('The project name to associate with the memory (alternative parameter name)')->required(false),
-            'document_type' => $schema->string()->description('The document type of the memory')->required(false),
-            'documentType' => $schema->string()->description('The document type of the memory (alternative parameter name)')->required(false),
+            'thing_to_remember' => $schema->string()->description('The content to remember')->required(),
+            'metadata' => $schema->object()->description('Additional metadata to store with the memory like title of the content')->required(),
+            'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory')->required(),
+            'project_name' => $schema->string()->description('The project name to associate with the memory')->required(),
+            'document_type' => $schema->string()->description('The document type of the memory')->required(),
         ];
     }
 }

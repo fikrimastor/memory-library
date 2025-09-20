@@ -33,11 +33,7 @@ class SearchMemory extends Tool
             // Validate required parameters
             $query = $params['query'] ?? '';
             if (empty($query)) {
-                return Response::json([
-                    'success' => false,
-                    'error' => 'Query is required',
-                    'message' => 'Failed to search memory: query is required',
-                ]);
+                return Response::text('Failed to search memory: query is required');
             }
 
             $action = app(SearchMemoryAction::class);
@@ -64,22 +60,10 @@ class SearchMemory extends Tool
                 // In a future implementation, we could determine if fallback was used
             }
 
-            return Response::json([
-                'success' => true,
-                'results' => $results->items(),
-                'total' => $results->total(),
-                'search_method' => $searchMethod,
-                'query' => $query,
-                'limit' => $limit,
-                'threshold' => $threshold,
-                'message' => 'Search completed successfully',
-            ]);
+            $totalResults = $results->total();
+            return Response::text("Search completed successfully. Found {$totalResults} results using {$searchMethod} search method.");
         } catch (Throwable $e) {
-            return Response::json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'message' => 'Failed to search memory',
-            ]);
+            return Response::text('Failed to search memory: ' . $e->getMessage());
         }
     }
 

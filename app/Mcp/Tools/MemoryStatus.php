@@ -65,29 +65,9 @@ class MemoryStatus extends Tool
             $completedJobs = EmbeddingJob::where('status', 'completed')->count();
             $failedJobs = EmbeddingJob::where('status', 'failed')->count();
 
-            return Response::json([
-                'success' => true,
-                'memory_stats' => [
-                    'total_count' => $memoryCount,
-                    'recent_memories' => $recentMemories,
-                    'by_document_type' => $memoryByType,
-                    'by_project' => $memoryByProject,
-                ],
-                'provider_health' => $providerHealth,
-                'embedding_jobs' => [
-                    'pending' => $pendingJobs,
-                    'processing' => $processingJobs,
-                    'completed' => $completedJobs,
-                    'failed' => $failedJobs,
-                ],
-                'message' => 'Status retrieved successfully',
-            ]);
+            return Response::text("Status retrieved successfully. Total memories: {$memoryCount}, Pending jobs: {$pendingJobs}, Processing jobs: {$processingJobs}, Completed jobs: {$completedJobs}, Failed jobs: {$failedJobs}");
         } catch (Throwable $e) {
-            return Response::json([
-                'success' => false,
-                'error' => $e->getMessage(),
-                'message' => 'Failed to retrieve status',
-            ]);
+            return Response::text('Failed to retrieve status: ' . $e->getMessage());
         }
     }
 
