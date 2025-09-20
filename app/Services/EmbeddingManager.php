@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Contracts\EmbeddingDriverInterface;
+use App\Drivers\Embedding\CloudFlareDriver;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
@@ -123,25 +124,7 @@ class EmbeddingManager
      */
     public function createCloudflareDriver(array $config): EmbeddingDriverInterface
     {
-        // We'll implement the actual driver later
-        // For now, we'll use a placeholder
-        return new class implements EmbeddingDriverInterface {
-            public function embed(string $text): array {
-                return array_fill(0, 768, 0.0);
-            }
-            
-            public function getName(): string {
-                return 'cloudflare';
-            }
-            
-            public function isHealthy(): bool {
-                return true;
-            }
-            
-            public function getDimensions(): int {
-                return 768;
-            }
-        };
+        return new CloudFlareDriver($config);
     }
 
     /**

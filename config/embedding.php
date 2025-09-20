@@ -37,7 +37,7 @@ return [
             'api_token' => env('CLOUDFLARE_API_TOKEN'),
             'account_id' => env('CLOUDFLARE_ACCOUNT_ID'),
             'model' => env('CLOUDFLARE_EMBEDDING_MODEL', '@cf/baai/bge-base-en-v1.5'),
-            'dimensions' => 768,
+            'dimensions' => env('CLOUDFLARE_EMBEDDING_MODEL_DIMENSION', 768),
             'rate_limit' => 1000,
         ],
 
