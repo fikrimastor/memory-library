@@ -47,7 +47,7 @@ class CloudFlareDriver implements EmbeddingDriverInterface
         $this->apiToken = $config['api_token'];
         $this->accountId = $config['account_id'];
         $this->model = $config['model'] ?? '@cf/baai/bge-m3';
-        $this->dimensions = $config['dimensions'] ?? 1024;
+        $this->dimensions = (int) ($config['dimensions'] ?? 1024);
     }
 
     /**

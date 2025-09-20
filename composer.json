@@ -15,7 +15,8 @@
         "laravel/framework": "^12.0",
         "laravel/mcp": "^0.2.0",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9"
+        "laravel/wayfinder": "^0.1.9",
+        "opcodesio/log-viewer": "^3.19"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

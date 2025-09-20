@@ -2,6 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
     App\Providers\EmbeddingServiceProvider::class,
+    App\Providers\FortifyServiceProvider::class,
 ];
