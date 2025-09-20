@@ -2,12 +2,17 @@
 
 This file provides guidance to Qwen Code when working with code in this repository.
 
+## Qwen Configuration
+
+### Default Subagent
+- **subagent_type**: vilt-pro
+
+### Tools
+- **mcp__laravel-boost**: Use for Laravel-specific tasks, code generation, and best practices
+
 ## Project Overview
 
-Memory Library is a Laravel application with Vue.js/TypeScript frontend using Inertia.js for seamless SPA-like experience. The project uses Laravel MCP server integration for model context protocol support.
-
-- **IMPORTANT** use subagent_type=vilt-pro while execute any task.
-- **IMPORTANT** follow the [Laravel Boost Guidelines](#laravel-boost-guidelines) at the end of this file when working with this codebase.
+Memory Library is a Laravel application with Vue.js/TypeScript frontend using Inertia.js for seamless SPA-like experience (**VILT stack**). The project uses Laravel MCP server integration for model context protocol support.
 
 ## Tech Stack
 
