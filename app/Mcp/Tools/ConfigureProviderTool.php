@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Mcp\Tools;
 
 use App\Actions\HealthCheckAction;
+use App\Models\ProviderHealth;
+use App\Services\EmbeddingManager;
 use Throwable;
 
 class ConfigureProviderTool
@@ -42,14 +44,50 @@ class ConfigureProviderTool
                     'message' => 'Health check completed successfully',
                 ];
             }
+            
+            // If it's a provider test request
+            if (isset($params['test_provider']) && $params['test_provider']) {
+                $providerName = $params['provider_name'] ?? config('embedding.default');
+                $manager = app(EmbeddingManager::class);
+                
+                try {
+                    $driver = $manager->driver($providerName);
+                    $isHealthy = $driver->isHealthy();
+                    $testEmbedding = null;
+                    $testError = null;
+                    
+                    if ($isHealthy) {
+                        // Try to generate a test embedding
+                        $testEmbedding = $driver->embed('test');
+                    }
+                    
+                    return [
+                        'success' => true,
+                        'provider_test' => [
+                            'provider' => $providerName,
+                            'healthy' => $isHealthy,
+                            'test_embedding_generated' => $testEmbedding !== null,
+                        ],
+                        'message' => $isHealthy ? 'Provider test completed successfully' : 'Provider is not healthy',
+                    ];
+                } catch (\Exception $e) {
+                    return [
+                        'success' => false,
+                        'error' => $e->getMessage(),
+                        'message' => 'Failed to test provider',
+                    ];
+                }
+            }
 
-            // Default action - return current configuration
+            // Default action - return current configuration and health status
             $config = config('embedding');
+            $providerHealth = ProviderHealth::all();
 
             return [
                 'success' => true,
                 'configuration' => $config,
-                'message' => 'Configuration retrieved successfully',
+                'provider_health' => $providerHealth,
+                'message' => 'Configuration and health status retrieved successfully',
             ];
         } catch (Throwable $e) {
             return [
