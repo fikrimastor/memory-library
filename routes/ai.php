@@ -2,4 +2,4 @@
 
 use Laravel\Mcp\Facades\Mcp;
 
-// Mcp::web('/mcp/demo', \App\Mcp\Servers\PublicServer::class);
+Mcp::web('/mcp/memory', \App\Mcp\Servers\MemoryLibraryServer::class)->middleware(['auth', 'verified']);
