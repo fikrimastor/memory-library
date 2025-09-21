@@ -24,7 +24,7 @@ final class GetRecentMemoryAction
         return [
             'title' => $memory->title,
             'memory' => $memory->thing_to_remember,
-            'tags' => $memory->tags->toArray(),
+            'tags' => $memory->tags,
             'document_type' => $memory->document_type,
             'project_name' => $memory->project_name,
             'created_at' => $memory->created_at->diffForHumans(),

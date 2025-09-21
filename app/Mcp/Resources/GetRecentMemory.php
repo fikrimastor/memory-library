@@ -12,7 +12,10 @@ class GetRecentMemory extends Resource
     /**
      * The resource's description.
      */
-    protected string $description = 'The user\'s most recently added memory.';
+    protected string $description = 'The user\'s most recently added memory. 
+      Use this tool when:
+      1. You need latest memory about the user\'s preferences or past interactions
+      2. You need to verify if specific information about the user stored in memory';
 
     /**
      * Handle the resource request.
