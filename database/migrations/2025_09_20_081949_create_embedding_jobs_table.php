@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\App\Models\UserMemory::class,'memory_id')->constrained('user_memories')->onDelete('cascade');
             $table->string('provider', 50);
+            $table->json('embedding')->nullable();
             $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
             $table->unsignedInteger('attempts')->default(0);
             $table->unsignedInteger('max_attempts')->default(3);

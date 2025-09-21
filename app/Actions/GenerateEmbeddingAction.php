@@ -33,7 +33,8 @@ final class GenerateEmbeddingAction
             $embedding = $driver->embed($memory->thing_to_remember);
 
             // Update the memory with the embedding
-            $memory->update(['embedding' => $embedding]);
+            $embeddingJob = $memory->embeddingJob;
+            $embeddingJob?->update(['embedding' => $embedding]);
 
             return $embedding;
         } catch (\Exception $e) {

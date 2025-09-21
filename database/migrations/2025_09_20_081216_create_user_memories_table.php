@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('document_type')->default('Memory');
             $table->string('project_name')->nullable();
             $table->json('tags')->nullable();
-            $table->json('embedding')->nullable();
             $table->timestamps();
             
             $table->index(['user_id', 'project_name'], 'idx_user_memories_user_project');
