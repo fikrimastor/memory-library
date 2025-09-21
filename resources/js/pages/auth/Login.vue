@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { register } from '@/routes';
 import { Head } from '@inertiajs/vue3';
 
 // Use direct URL instead of router.get
@@ -49,11 +47,6 @@ defineProps<{
                 </svg>
                 Continue with GitHub
             </Button>
-
-            <div class="text-center text-sm text-muted-foreground">
-                Don't have an account?
-                <TextLink :href="register()">Create one with GitHub</TextLink>
-            </div>
         </div>
     </AuthBase>
 </template>

@@ -11,7 +11,7 @@ return [
     |
     */
 
-    'default' => env('EMBEDDING_PROVIDER', 'openai'),
+    'default' => env('EMBEDDING_PROVIDER', 'cloudflare'),
 
     /*
     |--------------------------------------------------------------------------
@@ -59,7 +59,7 @@ return [
     |
     */
 
-    'fallback_providers' => ['cloudflare', 'cohere'],
+    'fallback_providers' => ['openai', 'cohere'],
 
     /*
     |--------------------------------------------------------------------------
