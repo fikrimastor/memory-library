@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { PlusIcon, TrashIcon } from 'lucide-vue-next';
+import { useClipboard } from '@vueuse/core';
 import { index as apiTokensIndex, store as apiTokensStore, destroy as apiTokensDestroy } from '@/routes/api-tokens';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -35,7 +36,7 @@ interface Props {
     tokens: ApiToken[];
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -49,7 +50,9 @@ const showCreateDialog = ref(false);
 const tokenName = ref('');
 const createdToken = ref<string | null>(null);
 const showTokenDialog = ref(false);
-const copyButtonText = ref('Copy Token');
+
+// Clipboard functionality
+const { copy, copied, isSupported } = useClipboard();
 
 // State for revoke token dialog
 const showRevokeDialog = ref(false);
@@ -91,7 +94,7 @@ const createToken = async () => {
                 isCreating.value = false;
             }
         });
-    } catch (error) {
+    } catch {
         createError.value = 'Failed to create token';
         isCreating.value = false;
     }
@@ -120,7 +123,7 @@ const revokeToken = async () => {
                 tokenToRevoke.value = null;
             }
         });
-    } catch (error) {
+    } catch {
         revokeError.value = 'Failed to revoke token';
         isRevoking.value = false;
     }
@@ -139,61 +142,10 @@ const getTokenStatus = (token: ApiToken) => {
     return token.last_used_at ? 'Used' : 'Unused';
 };
 
-const copyToClipboard = async (text: string) => {
-    if (!text) {
-        return;
-    }
-
-    let copied = false;
-
-    // Check if modern clipboard API is available
-    if (navigator.clipboard && window.isSecureContext) {
-        try {
-            await navigator.clipboard.writeText(text);
-            copied = true;
-        } catch (error) {
-            console.log('Clipboard API failed:', error);
-        }
-    }
-
-    // Fallback method for older browsers or non-HTTPS
-    if (!copied) {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.top = '0';
-        textArea.style.left = '-9999px';
-        textArea.setAttribute('readonly', '');
-        document.body.appendChild(textArea);
-
-        textArea.select();
-        textArea.setSelectionRange(0, 99999); // For mobile devices
-
-        try {
-            const success = document.execCommand('copy');
-            if (success) {
-                copied = true;
-            }
-        } catch (error) {
-            console.error('Fallback copy error:', error);
-        } finally {
-            document.body.removeChild(textArea);
-        }
-    }
-
-    // Show visual feedback
-    if (copied) {
-        copyButtonText.value = 'Copied!';
-        setTimeout(() => {
-            copyButtonText.value = 'Copy Token';
-        }, 2000);
-    }
-};
 
 const closeTokenDialog = () => {
     showTokenDialog.value = false;
     createdToken.value = null;
-    copyButtonText.value = 'Copy Token';
 };
 </script>
 
@@ -326,11 +278,14 @@ const closeTokenDialog = () => {
                         <DialogFooter class="flex-shrink-0 flex-col-reverse sm:flex-row gap-2">
                             <Button
                                 variant="outline"
-                                @click="copyToClipboard(createdToken || '')"
+                                @click="copy(createdToken || '')"
                                 class="w-full sm:w-auto"
                             >
-                                {{ copyButtonText }}
+                                {{ copied ? 'Copied!' : 'Copy Token' }}
                             </Button>
+                            <div v-if="!isSupported" class="text-xs text-muted-foreground">
+                                Clipboard not supported
+                            </div>
                             <Button
                                 @click="closeTokenDialog"
                                 class="w-full sm:w-auto"
