@@ -33,9 +33,7 @@ class AddToMemory extends Tool
     public function handle(Request $request): Response
     {
         try {
-            $params = $request->validate([
-                'thing_to_remember' => 'required|string'
-            ]);
+            $params = $request->all();
 
             // Validate required parameters
             $content = $params['thing_to_remember'];
@@ -54,7 +52,7 @@ class AddToMemory extends Tool
                 documentType: $params['document_type'] ?? 'Memory'
             );
 
-            return Response::text("Memory added successfully. Memory ID: {$memory->id}");
+            return Response::text("Memory added successfully. Memory: {$memory->success_message_created}");
         } catch (Throwable $e) {
             return Response::text('Failed to add memory: ' . $e->getMessage());
         }
