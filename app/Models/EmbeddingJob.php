@@ -39,6 +39,6 @@ class EmbeddingJob extends Model
      */
     public function memory(): BelongsTo
     {
-        return $this->belongsTo(UserMemory::class);
+        return $this->belongsTo(UserMemory::class, 'memory_id', 'id');
     }
 }

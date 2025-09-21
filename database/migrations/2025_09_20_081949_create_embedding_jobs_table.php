@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('embedding_jobs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('memory_id')->constrained('user_memories')->onDelete('cascade');
+            $table->foreignIdFor(\App\Models\UserMemory::class,'memory_id')->constrained('user_memories')->onDelete('cascade');
             $table->string('provider', 50);
             $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
             $table->unsignedInteger('attempts')->default(0);

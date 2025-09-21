@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class UserMemory extends Model
 {
@@ -42,6 +43,14 @@ class UserMemory extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the user that owns the memory.
+     */
+    public function embeddingJob(): HasOne
+    {
+        return $this->hasOne(EmbeddingJob::class, 'memory_id', 'id');
     }
 
     protected function successMessageCreated(): Attribute
