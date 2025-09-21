@@ -29,8 +29,6 @@ class MemoryLibraryServer extends Server
     protected array $tools = [
         \App\Mcp\Tools\AddToMemory::class,
         \App\Mcp\Tools\SearchMemory::class,
-        \App\Mcp\Tools\MemoryStatus::class,
-        \App\Mcp\Tools\ConfigureProvider::class,
     ];
 
     /**
@@ -39,7 +37,7 @@ class MemoryLibraryServer extends Server
      * @var array<int, class-string<\Laravel\Mcp\Server\Resource>>
      */
     protected array $resources = [
-        //
+        \App\Mcp\Resources\GetRecentMemory::class,
     ];
 
     /**

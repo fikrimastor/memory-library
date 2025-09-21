@@ -51,6 +51,14 @@ class User extends Authenticatable implements OAuthenticatable
     }
 
     /**
+     * Get the memories for the user.
+     */
+    public function memories(): HasMany
+    {
+        return $this->hasMany(UserMemory::class);
+    }
+
+    /**
      * Get the social accounts for the user.
      */
     public function socialAccounts(): HasMany
