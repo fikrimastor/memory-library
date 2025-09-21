@@ -67,10 +67,15 @@ class ApiTokenController extends Controller
                 ], 201);
             }
 
-            return to_route('api-tokens.index')->with([
-                'success' => 'API token created successfully.',
-                'token' => $token->accessToken,
-            ]);
+            // For web/Inertia requests, store token in session then redirect
+            session(['created_token' => $token->accessToken]);
+
+//            return to_route('api-tokens.index')->with([
+//                'success' => 'API token created successfully.',
+//                'token' => $token->accessToken,
+//                'createdToken' => $token->accessToken,
+//                'showTokenDialog' => true,
+//            ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -86,6 +91,8 @@ class ApiTokenController extends Controller
                 'error' => 'Failed to create API token. Please try again.',
             ]);
         }
+
+        return back();
     }
 
     /**

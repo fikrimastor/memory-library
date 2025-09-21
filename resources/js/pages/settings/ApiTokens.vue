@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Form, Head, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { Head, router } from '@inertiajs/vue3';
 import { PlusIcon, TrashIcon } from 'lucide-vue-next';
 import { index as apiTokensIndex, store as apiTokensStore, destroy as apiTokensDestroy } from '@/routes/api-tokens';
 
@@ -49,6 +49,7 @@ const showCreateDialog = ref(false);
 const tokenName = ref('');
 const createdToken = ref<string | null>(null);
 const showTokenDialog = ref(false);
+const copyButtonText = ref('Copy Token');
 
 // State for revoke token dialog
 const showRevokeDialog = ref(false);
@@ -139,22 +140,60 @@ const getTokenStatus = (token: ApiToken) => {
 };
 
 const copyToClipboard = async (text: string) => {
-    try {
-        await navigator.clipboard.writeText(text);
-    } catch (error) {
-        // Fallback for older browsers
+    if (!text) {
+        return;
+    }
+
+    let copied = false;
+
+    // Check if modern clipboard API is available
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(text);
+            copied = true;
+        } catch (error) {
+            console.log('Clipboard API failed:', error);
+        }
+    }
+
+    // Fallback method for older browsers or non-HTTPS
+    if (!copied) {
         const textArea = document.createElement('textarea');
         textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '-9999px';
+        textArea.setAttribute('readonly', '');
         document.body.appendChild(textArea);
+
         textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
+        textArea.setSelectionRange(0, 99999); // For mobile devices
+
+        try {
+            const success = document.execCommand('copy');
+            if (success) {
+                copied = true;
+            }
+        } catch (error) {
+            console.error('Fallback copy error:', error);
+        } finally {
+            document.body.removeChild(textArea);
+        }
+    }
+
+    // Show visual feedback
+    if (copied) {
+        copyButtonText.value = 'Copied!';
+        setTimeout(() => {
+            copyButtonText.value = 'Copy Token';
+        }, 2000);
     }
 };
 
 const closeTokenDialog = () => {
     showTokenDialog.value = false;
     createdToken.value = null;
+    copyButtonText.value = 'Copy Token';
 };
 </script>
 
@@ -267,31 +306,35 @@ const closeTokenDialog = () => {
 
                 <!-- Show Token Dialog -->
                 <Dialog v-model:open="showTokenDialog">
-                    <DialogContent class="sm:max-w-md">
-                        <DialogHeader>
+                    <DialogContent class="sm:max-w-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                        <DialogHeader class="flex-shrink-0">
                             <DialogTitle>API Token Created</DialogTitle>
                             <DialogDescription>
                                 Copy your new API token. For security reasons, it won't be shown again.
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div class="space-y-4">
-                            <div class="p-3 bg-muted rounded-md">
-                                <code class="text-sm font-mono break-all">{{ createdToken }}</code>
+                        <div class="space-y-4 flex-1 overflow-y-auto min-h-0">
+                            <div class="p-4 bg-muted rounded-lg border">
+                                <code class="text-xs sm:text-sm font-mono break-all leading-relaxed block">{{ createdToken }}</code>
                             </div>
-                            <p class="text-xs text-muted-foreground">
+                            <p class="text-sm text-muted-foreground">
                                 Make sure to copy your API token now. You won't be able to see it again!
                             </p>
                         </div>
 
-                        <DialogFooter>
+                        <DialogFooter class="flex-shrink-0 flex-col-reverse sm:flex-row gap-2">
                             <Button
                                 variant="outline"
                                 @click="copyToClipboard(createdToken || '')"
+                                class="w-full sm:w-auto"
                             >
-                                Copy Token
+                                {{ copyButtonText }}
                             </Button>
-                            <Button @click="closeTokenDialog">
+                            <Button
+                                @click="closeTokenDialog"
+                                class="w-full sm:w-auto"
+                            >
                                 Done
                             </Button>
                         </DialogFooter>
