@@ -46,6 +46,6 @@ class UserMemory extends Model
 
     protected function successMessageCreated(): Attribute
     {
-        return Attribute::get(fn () => "Memory added successfully. Memory: {$this->title}. " . $this->tags->toJson());
+        return Attribute::get(fn () => "Memory added successfully. Memory: {$this->title}. " . json_encode($this->tags));
     }
 }

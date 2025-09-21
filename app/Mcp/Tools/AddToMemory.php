@@ -52,7 +52,7 @@ class AddToMemory extends Tool
                 documentType: $params['document_type'] ?? 'Memory'
             );
 
-            return Response::text("Memory added successfully. Memory: {$memory->success_message_created}");
+            return Response::text($memory->success_message_created);
         } catch (Throwable $e) {
             return Response::text('Failed to add memory: ' . $e->getMessage());
         }

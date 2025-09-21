@@ -58,7 +58,7 @@ CLOUDFLARE_EMBEDDING_MODEL_DIMENSION=1024
 1. **API Token**:
     - Go to the [Cloudflare dashboard](https://dash.cloudflare.com/)
     - Navigate to **User Profile** → **API Tokens**
-    - Create a token with `AI Gateway Read` and `AI Gateway Write` permissions
+    - Create a token with `Worker AI Read` and `Worker AI Write` permissions
 
 2. **Account ID**:
     - Available in the Cloudflare dashboard URL after logging in
