@@ -7,7 +7,6 @@ import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import DeleteUser from '@/components/DeleteUser.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
-import SocialAccounts from '@/components/SocialAccounts.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -123,8 +122,6 @@ const user = page.props.auth.user;
                     </div>
                 </Form>
             </div>
-
-            <SocialAccounts :social-accounts="socialAccounts" />
 
             <DeleteUser />
         </SettingsLayout>

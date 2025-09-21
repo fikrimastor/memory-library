@@ -267,8 +267,8 @@ const closeTokenDialog = () => {
                         </DialogHeader>
 
                         <div class="space-y-4 flex-1 overflow-y-auto min-h-0">
-                            <div class="p-4 bg-muted rounded-lg border">
-                                <code class="text-xs sm:text-sm font-mono break-all leading-relaxed block">{{ createdToken }}</code>
+                            <div v-if="($page.props.flash as any)?.token" class="p-4 bg-muted rounded-lg border">
+                                <code class="text-xs sm:text-sm font-mono break-all leading-relaxed block">{{ ($page.props.flash as any)?.token }}</code>
                             </div>
                             <p class="text-sm text-muted-foreground">
                                 Make sure to copy your API token now. You won't be able to see it again!
@@ -278,7 +278,7 @@ const closeTokenDialog = () => {
                         <DialogFooter class="flex-shrink-0 flex-col-reverse sm:flex-row gap-2">
                             <Button
                                 variant="outline"
-                                @click="copy(createdToken || '')"
+                                @click="copy(($page.props.flash as any)?.token || '')"
                                 class="w-full sm:w-auto"
                             >
                                 {{ copied ? 'Copied!' : 'Copy Token' }}
