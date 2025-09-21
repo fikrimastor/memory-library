@@ -61,13 +61,14 @@ final class SearchMemoryAction
         $queryEmbedding = $this->embeddingManager->driver()->embed($query);
 
         // Get all memories with embeddings for this user
-        $memories = UserMemory::where('user_id', $userId)
-            ->whereNotNull('embedding')
+        $memories = UserMemory::with('embeddingJob')
+            ->where('user_id', $userId)
+            ->whereHas('embeddingJob', fn ($query) => $query->whereNotNull('embedding'))
             ->get();
 
         // Calculate similarities and filter by threshold
         $similarities = $memories->map(function ($memory) use ($queryEmbedding, $threshold) {
-            $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embedding);
+            $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embeddingJob->embedding);
             
             // Only include memories that meet the threshold
             if ($similarity >= $threshold) {

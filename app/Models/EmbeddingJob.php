@@ -18,6 +18,7 @@ class EmbeddingJob extends Model
     protected $fillable = [
         'memory_id',
         'provider',
+        'embedding',
         'status',
         'attempts',
         'max_attempts',
@@ -32,6 +33,7 @@ class EmbeddingJob extends Model
      */
     protected $casts = [
         'payload' => 'array',
+        'embedding' => 'array',
     ];
 
     /**

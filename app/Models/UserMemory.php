@@ -24,7 +24,6 @@ class UserMemory extends Model
         'document_type',
         'project_name',
         'tags',
-        'embedding',
     ];
 
     /**
@@ -34,7 +33,6 @@ class UserMemory extends Model
      */
     protected $casts = [
         'tags' => 'array',
-        'embedding' => 'array',
     ];
 
     /**
