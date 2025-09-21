@@ -1,27 +1,22 @@
 <script setup lang="ts">
-import AuthenticatedSessionController from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
-import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { register } from '@/routes';
-import { request } from '@/routes/password';
-import { Form, Head, router } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
+import { Head } from '@inertiajs/vue3';
+
+// Use direct URL instead of router.get
+const githubLoginUrl = '/auth/github';
 
 defineProps<{
     status?: string;
-    canResetPassword: boolean;
 }>();
 </script>
 
 <template>
     <AuthBase
-        title="Log in to your account"
-        description="Enter your email and password below to log in"
+        title="Welcome back"
+        description="Sign in to your account using GitHub"
     >
         <Head title="Log in" />
 
@@ -32,93 +27,16 @@ defineProps<{
             {{ status }}
         </div>
 
-        <Form
-            v-bind="AuthenticatedSessionController.store.form()"
-            :reset-on-success="['password']"
-            v-slot="{ errors, processing }"
-            class="flex flex-col gap-6"
-        >
-            <div class="grid gap-6">
-                <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="email"
-                        placeholder="email@example.com"
-                    />
-                    <InputError :message="errors.email" />
-                </div>
-
-                <div class="grid gap-2">
-                    <div class="flex items-center justify-between">
-                        <Label for="password">Password</Label>
-                        <TextLink
-                            v-if="canResetPassword"
-                            :href="request()"
-                            class="text-sm"
-                            :tabindex="5"
-                        >
-                            Forgot password?
-                        </TextLink>
-                    </div>
-                    <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        required
-                        :tabindex="2"
-                        autocomplete="current-password"
-                        placeholder="Password"
-                    />
-                    <InputError :message="errors.password" />
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" :tabindex="3" />
-                        <span>Remember me</span>
-                    </Label>
-                </div>
-
-                <Button
-                    type="submit"
-                    class="mt-4 w-full"
-                    :tabindex="4"
-                    :disabled="processing"
-                    data-test="login-button"
-                >
-                    <LoaderCircle
-                        v-if="processing"
-                        class="h-4 w-4 animate-spin"
-                    />
-                    Log in
-                </Button>
-            </div>
-
-            <div class="relative my-4">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-300"></div>
-                </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="bg-background px-2 text-muted-foreground">
-                        Or continue with
-                    </span>
-                </div>
-            </div>
+        <div class="flex flex-col gap-6">
 
             <Button
                 as="a"
-                @click="router.get('/auth/github')"
-                variant="outline"
+                :href="githubLoginUrl"
                 class="w-full"
+                size="lg"
             >
                 <svg
-                    class="mr-2 h-4 w-4"
+                    class="mr-3 h-5 w-5"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                     aria-hidden="true"
@@ -129,13 +47,13 @@ defineProps<{
                         clip-rule="evenodd"
                     />
                 </svg>
-                Log in with GitHub
+                Continue with GitHub
             </Button>
 
             <div class="text-center text-sm text-muted-foreground">
                 Don't have an account?
-                <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
+                <TextLink :href="register()">Create one with GitHub</TextLink>
             </div>
-        </Form>
+        </div>
     </AuthBase>
 </template>
