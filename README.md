@@ -37,6 +37,51 @@ Users can manage their API tokens in the user profile settings area (`/settings/
 
 Memory Library comes with an MCP server located at http://memory-library.test/mcp, with tools, resources, and prompts for AI assistant integration.
 
+
+# Cloudflare Embedding Model Setup for Production
+
+To use Cloudflare's AI embedding models in production, you'll need to configure the following environment variables in your `.env` file:
+
+```env
+# Set Cloudflare as the default embedding provider
+EMBEDDING_PROVIDER=cloudflare
+
+# Cloudflare Settings
+CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_EMBEDDING_MODEL="@cf/baai/bge-m3"
+CLOUDFLARE_EMBEDDING_MODEL_DIMENSION=1024
+```
+
+## Getting Cloudflare Credentials
+
+1. **API Token**:
+    - Go to the [Cloudflare dashboard](https://dash.cloudflare.com/)
+    - Navigate to **User Profile** → **API Tokens**
+    - Create a token with `AI Gateway Read` and `AI Gateway Write` permissions
+
+2. **Account ID**:
+    - Available in the Cloudflare dashboard URL after logging in
+    - Format: `https://dash.cloudflare.com/{account_id}`
+
+3. **Enable Workers AI**:
+    - Go to **Workers & Pages** → **AI** in the Cloudflare dashboard
+    - Enable Workers AI if not already enabled
+
+## Supported Models
+
+Memory Library supports these Cloudflare embedding models:
+- `@cf/baai/bge-m3` (1024 dimensions) - Recommended
+- `@cf/baai/bge-large-en-v1.5` (1024 dimensions)
+- `@cf/baai/bge-base-en-v1.5` (768 dimensions)
+
+After setting these environment variables, run the following commands to apply the changes:
+
+```shell
+php artisan config:cache
+php artisan cache:clear
+```
+
 # Setup
 
 ```shell
