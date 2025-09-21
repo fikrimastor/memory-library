@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Memory Library MCP Logo" src="/public/favicon.svg" />
+    <img height="200" alt="Memory Library MCP Logo" src="/public/favicon.svg" />
 </p>
 
 # Memory Library
@@ -116,3 +116,55 @@ php artisan pail --timeout=0
 # HTTP Notes
 
 Many AI agents use Node which comes with its own certificate store, meaning they'll fail to connect to an MCP server on `https://`. We recommend leaving Memory Library on `http://` locally for testing with AI agents, and using `https://` on production.
+
+# Why did you build Memory Library?
+
+## Primary Pain Points
+
+### 1. Context Gap Problem 🔍
+**Issue:** LLMs lack understanding of existing codebase structure and patterns
+
+- **Symptom:** When requesting new features, AI responses are generic and disconnected from project reality
+- **Impact:** Solutions don't align with established architecture or coding conventions
+- **Example:** Asking for a new Laravel feature results in vanilla Laravel code that ignores existing service patterns, custom abstractions, or project-specific implementations
+- **Business Cost:** Development time increases due to rework and architectural misalignment
+
+### 2. Manual Context Loading Overhead ⏱️
+**Issue:** Developers must manually copy and explain code to LLMs repeatedly
+
+- **Symptom:** Significant overhead in context preparation before productive work begins
+- **Impact:** Breaking development flow and reducing productivity
+- **Example:** Need to paste controller code, service classes, migrations, and documentation every time asking for related functionality
+- **Business Cost:** Estimated 30-40% of AI interaction time spent on context setup rather than problem-solving
+
+### 3. Inconsistent AI Suggestions 🎯
+**Issue:** Without proper context, AI suggestions don't match project patterns
+
+- **Symptom:** Recommendations that require significant modification to fit codebase
+- **Impact:** Suboptimal code quality and architectural drift
+- **Example:** AI suggests using standard Laravel validation when project uses custom form request patterns with specific error handling
+- **Business Cost:** Technical debt accumulation and inconsistent code patterns
+
+### 4. Limited Code Discovery 🔎
+**Issue:** LLMs cannot efficiently find relevant code sections or understand project-wide patterns
+
+- **Symptom:** Cannot leverage existing implementations or identify reusable components
+- **Impact:** Code duplication and missed optimization opportunities
+- **Example:** Re-implementing functionality that already exists in different modules because AI cannot discover or reference existing solutions
+- **Business Cost:** Maintenance overhead and missed efficiency gains
+
+### 5. Knowledge Fragmentation 🧩
+**Issue:** Project knowledge scattered across different conversations and contexts
+
+- **Symptom:** Loss of accumulated context between sessions
+- **Impact:** Repeated explanations and loss of development momentum
+- **Example:** Previous architectural decisions, design patterns, or implementation details lost when starting new chat sessions
+- **Business Cost:** Knowledge management overhead and decision re-work
+
+### 6. Work With Multiple LLMs 🤖
+**Issue:** Different LLMs have varying capabilities and context handling
+
+- **Symptom:** Switching between models leads to inconsistent results
+- **Impact:** Fragmented development experience
+- **Example:** Some discussions work happen in Claude Desktop, continue finalising the requirements in Claude mobile, and execute the task in claude code CLI. This would lead to loss of context and inconsistent results.
+- **Business Cost:** Increased cognitive load and context switching overhead
