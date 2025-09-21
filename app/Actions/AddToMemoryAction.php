@@ -25,6 +25,7 @@ final class AddToMemoryAction
      * @param  string|null  $projectName  The project name
      * @param  string  $documentType  The document type
      * @param  bool  $generateEmbedding  Whether to generate an embedding
+     * @throws \Throwable
      */
     public function handle(
         int $userId,

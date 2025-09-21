@@ -17,6 +17,7 @@ import { type BreadcrumbItem } from '@/types';
 interface Props {
     mustVerifyEmail: boolean;
     status?: string;
+    socialAccounts: any[];
 }
 
 defineProps<Props>();

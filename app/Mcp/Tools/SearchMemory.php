@@ -5,6 +5,7 @@ namespace App\Mcp\Tools;
 use App\Actions\SearchMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
@@ -60,7 +61,22 @@ class SearchMemory extends Tool
             }
 
             $totalResults = $results->total();
-            return Response::text("Search completed successfully. Found {$totalResults} results using {$searchMethod} search method.");
+
+            $text = "Search completed successfully. Found {$totalResults} results using {$searchMethod} search method.";
+            foreach ($results as $result) {
+                $text .= "\n\n---\n";
+                if (!empty($result['title'])) {
+                    $text .= "**{$result['title']}**\n";
+                }
+                // $text .= "URL: {$result['link']['url']}\n"; TODO: Add URL if applicable
+                $text .= 'Tags: '.implode(', ', $result['tags'])."\n";
+                $text .= 'Document Type: '.str($result['document_type'])->headline()->value()."\n";
+                $text .= 'Project Name: '.$result['project_name']."\n";
+                $text .= 'Created On: '.$result['created_at']."\n";
+                $text .= "Memory:\n\n {$result['thing_to_remember']}\n";
+            }
+
+            return Response::text($text);
         } catch (Throwable $e) {
             return Response::text('Failed to search memory: ' . $e->getMessage());
         }
