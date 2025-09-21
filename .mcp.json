@@ -6,6 +6,9 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "memory-library": {
+            "url": "http://memory-library.test/mcp"
         }
     }
 }
