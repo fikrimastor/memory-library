@@ -1,3 +1,7 @@
+<p align="center">
+    <img alt="Memory Library MCP Logo" src="/public/favicon.svg" />
+</p>
+
 # Memory Library
 
 Memory Library is a personal memory management application that stores, organizes, and semantically searches your memories using AI-powered embeddings.
