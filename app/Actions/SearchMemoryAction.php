@@ -137,7 +137,7 @@ final class SearchMemoryAction
         foreach ($textMemories as $memory) {
             $textScore = $this->calculateTextRelevanceScore($memory, $words);
 
-            if ($textScore > 0) {
+            if ($textScore > config('embedding.hybrid_search.text_weight')) {
                 $memory->text_score = $textScore;
                 $textResults->put($memory->id, $memory);
             }
