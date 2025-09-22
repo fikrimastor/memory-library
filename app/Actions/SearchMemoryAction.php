@@ -261,8 +261,6 @@ final class SearchMemoryAction
             Log::debug("Similarity: {$query}", [
                 'memory_id' => $memory->id,
                 'similarity' => $similarity,
-                'query_embedding' => $queryEmbedding,
-                'db_embedding' => $memory->embeddingJob->embedding,
                 'threshold' => $threshold
             ]);
             
