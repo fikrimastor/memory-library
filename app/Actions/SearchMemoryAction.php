@@ -93,9 +93,7 @@ final class SearchMemoryAction
         try {
             $queryEmbedding = $this->embeddingManager->driver()->embed($query);
 
-            $memories = UserMemory::with(['embeddingJob' => function ($query) {
-                    $query->whereNotNull('embedding')->where('status', 'completed');
-                }])
+            $memories = UserMemory::with(['embeddingJob'])
                 ->where('user_id', $userId)
                 ->whereHas('embeddingJob', fn ($q) =>
                     $q->whereNotNull('embedding')->where('status', 'completed')
