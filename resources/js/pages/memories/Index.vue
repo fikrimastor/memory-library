@@ -144,33 +144,33 @@ const hasFilters = computed(() => props.filters.search)
         </div>
 
         <div class="flex items-center gap-2">
-          <Button
-            @click="refresh"
-            variant="outline"
-            size="sm"
-            :disabled="isRefreshing"
-            class="gap-2"
-          >
-            <RefreshCw :class="['h-4 w-4', { 'animate-spin': isRefreshing }]" />
-            Refresh
-          </Button>
+<!--          <Button-->
+<!--            @click="refresh"-->
+<!--            variant="outline"-->
+<!--            size="sm"-->
+<!--            :disabled="isRefreshing"-->
+<!--            class="gap-2"-->
+<!--          >-->
+<!--            <RefreshCw :class="['h-4 w-4', { 'animate-spin': isRefreshing }]" />-->
+<!--            Refresh-->
+<!--          </Button>-->
 
-          <Button
-            @click="restoreIndex"
-            variant="outline"
-            size="sm"
-            class="gap-2"
-          >
-            <RotateCcw class="h-4 w-4" />
-            Restore Index
-          </Button>
+<!--          <Button-->
+<!--            @click="restoreIndex"-->
+<!--            variant="outline"-->
+<!--            size="sm"-->
+<!--            class="gap-2"-->
+<!--          >-->
+<!--            <RotateCcw class="h-4 w-4" />-->
+<!--            Restore Index-->
+<!--          </Button>-->
 
-          <Button as-child class="gap-2">
-            <Link :href="memoriesIndex({ query: { create: '1' } }).url">
-              <Plus class="h-4 w-4" />
-              Add Memory
-            </Link>
-          </Button>
+<!--          <Button as-child class="gap-2">-->
+<!--            <Link :href="memoriesIndex({ query: { create: '1' } }).url">-->
+<!--              <Plus class="h-4 w-4" />-->
+<!--              Add Memory-->
+<!--            </Link>-->
+<!--          </Button>-->
         </div>
       </div>
 
@@ -221,32 +221,32 @@ const hasFilters = computed(() => props.filters.search)
                 {{ memory.title }}
               </CardTitle>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <MoreVertical class="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem as-child>
-                    <Link :href="memoriesEdit(memory.id).url" class="flex items-center gap-2">
-                      <Edit class="h-4 w-4" />
-                      Edit
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    @click="deleteMemory(memory)"
-                    class="flex items-center gap-2 text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 class="h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+<!--              <DropdownMenu>-->
+<!--                <DropdownMenuTrigger as-child>-->
+<!--                  <Button-->
+<!--                    variant="ghost"-->
+<!--                    size="sm"-->
+<!--                    class="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"-->
+<!--                  >-->
+<!--                    <MoreVertical class="h-4 w-4" />-->
+<!--                  </Button>-->
+<!--                </DropdownMenuTrigger>-->
+<!--                <DropdownMenuContent align="end">-->
+<!--                  <DropdownMenuItem as-child>-->
+<!--                    <Link :href="memoriesEdit(memory.id).url" class="flex items-center gap-2">-->
+<!--                      <Edit class="h-4 w-4" />-->
+<!--                      Edit-->
+<!--                    </Link>-->
+<!--                  </DropdownMenuItem>-->
+<!--                  <DropdownMenuItem-->
+<!--                    @click="deleteMemory(memory)"-->
+<!--                    class="flex items-center gap-2 text-red-600 focus:text-red-600"-->
+<!--                  >-->
+<!--                    <Trash2 class="h-4 w-4" />-->
+<!--                    Delete-->
+<!--                  </DropdownMenuItem>-->
+<!--                </DropdownMenuContent>-->
+<!--              </DropdownMenu>-->
             </div>
 
             <!-- Meta Information -->
@@ -292,27 +292,27 @@ const hasFilters = computed(() => props.filters.search)
               </Badge>
             </div>
 
-            <Separator class="my-3" />
+<!--            <Separator class="my-3" />-->
 
-            <!-- Action Buttons -->
-            <div class="flex items-center justify-between">
-              <Button as-child variant="outline" size="sm">
-                <Link :href="memoriesEdit(memory.id).url" class="gap-2">
-                  <Edit class="h-3 w-3" />
-                  Edit
-                </Link>
-              </Button>
+<!--            &lt;!&ndash; Action Buttons &ndash;&gt;-->
+<!--            <div class="flex items-center justify-between">-->
+<!--              <Button as-child variant="outline" size="sm">-->
+<!--                <Link :href="memoriesEdit(memory.id).url" class="gap-2">-->
+<!--                  <Edit class="h-3 w-3" />-->
+<!--                  Edit-->
+<!--                </Link>-->
+<!--              </Button>-->
 
-              <Button
-                @click="deleteMemory(memory)"
-                variant="outline"
-                size="sm"
-                class="gap-2 text-red-600 hover:text-red-700 hover:border-red-300"
-              >
-                <Trash2 class="h-3 w-3" />
-                Delete
-              </Button>
-            </div>
+<!--              <Button-->
+<!--                @click="deleteMemory(memory)"-->
+<!--                variant="outline"-->
+<!--                size="sm"-->
+<!--                class="gap-2 text-red-600 hover:text-red-700 hover:border-red-300"-->
+<!--              >-->
+<!--                <Trash2 class="h-3 w-3" />-->
+<!--                Delete-->
+<!--              </Button>-->
+<!--            </div>-->
           </CardContent>
         </Card>
       </div>
