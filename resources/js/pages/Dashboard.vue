@@ -144,11 +144,8 @@ const configs = computed(() => ({
     content: `{
   "mcpServers": {
     "memory-library": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "${mcpUrl.value}"
-      ]
+      "type": "http",
+      "url": "${mcpUrl.value}"
     }
   }
 }`
@@ -158,11 +155,14 @@ const configs = computed(() => ({
     content: `{
   "mcpServers": {
     "memory-library": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "${mcpUrl.value}"
-      ]
+      "type": "http",
+      "url": "${mcpUrl.value}",
+      "requestInit": {
+                "headers": {
+                    "Authorization": "Bearer YOUR_API_KEY_HERE",
+                    "Content-Type": "application/json"
+                }
+            }
     }
   }
 }`

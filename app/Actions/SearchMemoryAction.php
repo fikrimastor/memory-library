@@ -32,8 +32,29 @@ final class SearchMemoryAction
         int $limit = 10,
         float $threshold = 0.7,
         bool $useEmbedding = true,
-        bool $fallbackToDatabase = true
+        bool $fallbackToDatabase = true,
+        bool $useHybridSearch = false,
+        float $vectorWeight = 0.7,
+        float $textWeight = 0.3
     ): LengthAwarePaginator {
+        // If hybrid search is enabled, combine both vector and text search
+        if ($useHybridSearch) {
+            try {
+                return $this->hybridSearch($userId, $query, $limit, $threshold, $vectorWeight, $textWeight);
+            } catch (\Exception $e) {
+                // If hybrid search fails and fallback is enabled, use database search
+                if ($fallbackToDatabase) {
+                    \Illuminate\Support\Facades\Log::warning('Hybrid search failed, falling back to database search', [
+                        'query' => $query,
+                        'error' => $e->getMessage()
+                    ]);
+                    return $this->databaseSearch($userId, $query, $limit);
+                }
+
+                throw $e;
+            }
+        }
+
         // If we're using embedding and have a working provider, perform vector search
         if ($useEmbedding) {
             try {
@@ -53,12 +74,166 @@ final class SearchMemoryAction
     }
 
     /**
+     * Perform hybrid search combining vector similarity and text matching.
+     */
+    protected function hybridSearch(
+        int $userId,
+        string $query,
+        int $limit,
+        float $threshold,
+        float $vectorWeight,
+        float $textWeight
+    ): LengthAwarePaginator {
+        // Run both searches in parallel
+        $vectorResults = collect();
+        $textResults = collect();
+
+        // Get vector search results
+        try {
+            $queryEmbedding = $this->embeddingManager->driver()->embed($query);
+
+            $memories = UserMemory::with('embeddingJob')
+                ->where('user_id', $userId)
+                ->whereHas('embeddingJob', fn ($q) => $q->whereNotNull('embedding'))
+                ->get();
+
+            foreach ($memories as $memory) {
+                $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embeddingJob->embedding);
+
+                if ($similarity >= $threshold) {
+                    $memory->vector_score = $similarity;
+                    $vectorResults->put($memory->id, $memory);
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::info('Vector search failed in hybrid mode, using text search only', [
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        // Get text search results
+        $words = array_filter(array_map('trim', explode(' ', $query)));
+        $textMemories = UserMemory::where('user_id', $userId)
+            ->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    if (strlen($word) < 3) continue;
+
+                    $q->orWhere(function ($subQuery) use ($word) {
+                        $subQuery->where('thing_to_remember', 'LIKE', "%{$word}%")
+                                ->orWhere('title', 'LIKE', "%{$word}%")
+                                ->orWhere('project_name', 'LIKE', "%{$word}%")
+                                ->orWhereJsonContains('tags', $word);
+                    });
+                }
+            })
+            ->get();
+
+        // Calculate text relevance scores
+        foreach ($textMemories as $memory) {
+            $textScore = $this->calculateTextRelevanceScore($memory, $words);
+
+            if ($textScore > 0) {
+                $memory->text_score = $textScore;
+                $textResults->put($memory->id, $memory);
+            }
+        }
+
+        // Combine results with weighted scoring
+        $combinedResults = collect();
+
+        // Get all unique memory IDs
+        $allIds = $vectorResults->keys()->merge($textResults->keys())->unique();
+
+        foreach ($allIds as $memoryId) {
+            $vectorResult = $vectorResults->get($memoryId);
+            $textResult = $textResults->get($memoryId);
+
+            // Use the memory from either result set
+            $memory = $vectorResult ?? $textResult;
+
+            // Calculate hybrid score
+            $vectorScore = $vectorResult?->vector_score ?? 0;
+            $textScore = $textResult?->text_score ?? 0;
+
+            $hybridScore = ($vectorScore * $vectorWeight) + ($textScore * $textWeight);
+
+            $memory->hybrid_score = $hybridScore;
+            $memory->vector_score = $vectorScore;
+            $memory->text_score = $textScore;
+
+            $combinedResults->put($memoryId, $memory);
+        }
+
+        // Sort by hybrid score and paginate
+        $sortedResults = $combinedResults->sortByDesc('hybrid_score')->values();
+
+        return $this->paginateCollection($sortedResults, $limit);
+    }
+
+    /**
+     * Calculate text relevance score based on keyword matches.
+     */
+    protected function calculateTextRelevanceScore(UserMemory $memory, array $words): float
+    {
+        $score = 0.0;
+        $maxScore = count($words);
+
+        if ($maxScore === 0) return 0.0;
+
+        $weights = config('embedding.hybrid_search.text_relevance_weights', [
+            'title' => 3.0,
+            'tags' => 2.5,
+            'project_name' => 2.0,
+            'content' => 1.0,
+        ]);
+
+        foreach ($words as $word) {
+            if (strlen($word) < 3) continue;
+
+            $word = strtolower($word);
+
+            // Title matches are weighted higher
+            if (str_contains(strtolower($memory->title ?? ''), $word)) {
+                $score += $weights['title'];
+            }
+
+            // Project name matches
+            if (str_contains(strtolower($memory->project_name ?? ''), $word)) {
+                $score += $weights['project_name'];
+            }
+
+            // Tag matches (exact match in JSON array)
+            if (in_array($word, array_map('strtolower', $memory->tags ?? []))) {
+                $score += $weights['tags'];
+            }
+
+            // Content matches
+            if (str_contains(strtolower($memory->thing_to_remember ?? ''), $word)) {
+                $score += $weights['content'];
+            }
+        }
+
+        // Normalize score (0.0 to 1.0)
+        return min($score / ($maxScore * $weights['title']), 1.0);
+    }
+
+    /**
      * Perform vector similarity search using cosine similarity.
      */
     protected function vectorSearch(int $userId, string $query, int $limit, float $threshold): LengthAwarePaginator
     {
-        // Generate embedding for the query
-        $queryEmbedding = $this->embeddingManager->driver()->embed($query);
+        // Generate embedding for the query with timeout protection
+        try {
+            $queryEmbedding = $this->embeddingManager->driver()->embed($query);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to generate query embedding, falling back to database search', [
+                'query' => $query,
+                'error' => $e->getMessage()
+            ]);
+
+            // Fall back to database search immediately
+            return $this->databaseSearch($userId, $query, $limit);
+        }
 
         // Get all memories with embeddings for this user
         $memories = UserMemory::with('embeddingJob')

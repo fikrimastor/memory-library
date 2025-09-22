@@ -61,7 +61,7 @@ class CloudFlareDriver implements EmbeddingDriverInterface
     public function embed(string $text): array
     {
         try {
-            $response = Http::withHeaders([
+            $response = Http::timeout(10)->withHeaders([
                 'Authorization' => "Bearer {$this->apiToken}",
                 'Content-Type' => 'application/json',
             ])->post("{$this->getApiBaseUrl()}/accounts/{$this->accountId}/ai/run/{$this->model}", [

@@ -104,4 +104,26 @@ return [
     */
 
     'retry_delay' => [30, 120, 300], // seconds
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hybrid Search Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for hybrid search combining vector and text search.
+    |
+    */
+
+    'hybrid_search' => [
+        'enabled' => env('HYBRID_SEARCH_ENABLED', false),
+        'vector_weight' => env('HYBRID_SEARCH_VECTOR_WEIGHT', 0.7),
+        'text_weight' => env('HYBRID_SEARCH_TEXT_WEIGHT', 0.3),
+        'vector_threshold' => env('HYBRID_SEARCH_VECTOR_THRESHOLD', 0.3),
+        'text_relevance_weights' => [
+            'title' => 3.0,
+            'tags' => 2.5,
+            'project_name' => 2.0,
+            'content' => 1.0,
+        ],
+    ],
 ];
