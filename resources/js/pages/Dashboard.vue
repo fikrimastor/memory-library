@@ -106,9 +106,29 @@ const clients: Client[] = [
                 </svg>`
   },
   {
+    id: 'qwen',
+    name: 'Qwen',
+    description: 'Qwen Code CLI application',
+    icon: `<svg width="24" height="24" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M174.82 108.75L155.38 75L165.64 57.75C166.46 56.31 166.46 54.53 165.64 53.09L155.38 35.84C154.86 34.91 153.87 34.33 152.78 34.33H114.88L106.14 19.03C105.62 18.1 104.63 17.52 103.54 17.52H83.3C82.21 17.52 81.22 18.1 80.7 19.03L61.26 52.77H41.02C39.93 52.77 38.94 53.35 38.42 54.28L28.16 71.53C27.34 72.97 27.34 74.75 28.16 76.19L45.52 107.5L36.78 122.8C35.96 124.24 35.96 126.02 36.78 127.46L47.04 144.71C47.56 145.64 48.55 146.22 49.64 146.22H87.54L96.28 161.52C96.8 162.45 97.79 163.03 98.88 163.03H119.12C120.21 163.03 121.2 162.45 121.72 161.52L141.16 127.78H158.52C159.61 127.78 160.6 127.2 161.12 126.27L171.38 109.02C172.2 107.58 172.2 105.8 171.38 104.36L174.82 108.75Z" fill="url(#paint0_radial)"/>
+        <path d="M119.12 163.03H98.88L87.54 144.71H49.64L61.26 126.39H80.7L38.42 55.29H61.26L83.3 19.03L93.56 37.35L83.3 55.29H161.58L151.32 72.54L170.76 106.28H151.32L141.16 88.34L101.18 163.03H119.12Z" fill="white"/>
+        <path d="M127.86 79.83H76.14L101.18 122.11L127.86 79.83Z" fill="url(#paint1_radial)"/>
+        <defs>
+        <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(100 100) rotate(90) scale(100)">
+        <stop stop-color="#665CEE"/>
+        <stop offset="1" stop-color="#332E91"/>
+        </radialGradient>
+        <radialGradient id="paint1_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(100 100) rotate(90) scale(100)">
+        <stop stop-color="#665CEE"/>
+        <stop offset="1" stop-color="#332E91"/>
+        </radialGradient>
+        </defs>
+        </svg>`
+  },
+  {
     id: 'copilot',
     name: 'Copilot',
-    description: 'Codeium\'s AI-powered IDE',
+    description: 'AI pair programmer',
     icon: `<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-github-copilot">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
         <path d="M4 18v-5.5c0 -.667 .167 -1.333 .5 -2" />
@@ -150,6 +170,16 @@ const configs = computed(() => ({
   }
 }`
   },
+  qwen: {
+    title: 'Qwen Code Configuration',
+    content: `{
+  "mcpServers": {
+    "memory-library": {
+      "httpUrl": "${mcpUrl.value}"
+    }
+  }
+}`
+  },
   copilot: {
     title: 'GitHub Copilot Configuration',
     content: `{
@@ -158,11 +188,11 @@ const configs = computed(() => ({
       "type": "http",
       "url": "${mcpUrl.value}",
       "requestInit": {
-                "headers": {
-                    "Authorization": "Bearer YOUR_API_KEY_HERE",
-                    "Content-Type": "application/json"
-                }
-            }
+        "headers": {
+          "Authorization": "Bearer YOUR_API_KEY_HERE",
+          "Content-Type": "application/json"
+        }
+      }
     }
   }
 }`
