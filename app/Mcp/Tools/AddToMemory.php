@@ -3,7 +3,6 @@
 namespace App\Mcp\Tools;
 
 use App\Actions\AddToMemoryAction;
-use App\Models\EmbeddingJob;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Mcp\Request;
@@ -13,6 +12,10 @@ use Throwable;
 
 class AddToMemory extends Tool
 {
+    public function __construct(
+        protected AddToMemoryAction $action
+    ) {}
+
     /**
      * The tool's description.
      */
@@ -35,26 +38,52 @@ class AddToMemory extends Tool
         try {
             $params = $request->all();
 
+            // Get user ID from params or Auth
+            $userId = Auth::id();
+
             // Validate required parameters
-            $content = $params['thing_to_remember'];
+            $content = $params['thing_to_remember'] ?? '';
             if (empty($content)) {
-                return Response::text('Failed to add memory: content is required');
+                return Response::json([
+                    'success' => false,
+                    'error' => 'validation_error',
+                    'message' => 'thing_to_remember is required',
+                ]);
             }
 
-            $action = app(AddToMemoryAction::class);
+            if (! $userId) {
+                return Response::json([
+                    'success' => false,
+                    'error' => 'authentication_error',
+                    'message' => 'user_id is required when not authenticated',
+                ]);
+            }
 
-            $memory = $action->handle(
-                userId: Auth::id(),
+            $generateEmbedding = $params['generate_embedding'] ?? true;
+
+            $memory = $this->action->handle(
+                userId: $userId,
                 content: $content,
                 metadata: $params['metadata'] ?? [],
                 tags: $params['tags'] ?? [],
                 projectName: $params['project_name'] ?? null,
-                documentType: $params['document_type'] ?? 'Memory'
+                documentType: $params['document_type'] ?? 'Memory',
+                generateEmbedding: $generateEmbedding
             );
 
-            return Response::text($memory->success_message_created);
+            return Response::json([
+                'success' => true,
+                'message' => 'Memory added successfully',
+                'title' => $memory->title,
+                'project_name' => $memory->project_name,
+                'embedding_queued' => $generateEmbedding,
+            ]);
         } catch (Throwable $e) {
-            return Response::text('Failed to add memory: ' . $e->getMessage());
+            return Response::json([
+                'success' => false,
+                'error' => 'creation_error',
+                'message' => 'Failed to add memory: '.$e->getMessage(),
+            ]);
         }
     }
 
@@ -71,6 +100,7 @@ class AddToMemory extends Tool
             'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory')->required(),
             'project_name' => $schema->string()->description('The project name to associate with the memory')->required(),
             'document_type' => $schema->string()->description('The document type of the memory')->required(),
+            'generate_embedding' => $schema->boolean()->description('Whether to generate an embedding for this memory'),
         ];
     }
 }
