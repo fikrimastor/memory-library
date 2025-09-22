@@ -74,6 +74,15 @@ const dashboardUrl = '/dashboard';
             Is AI forgetting who you are, your context, or preferences?
             Memory Library provides seamless context persistence across all your AI interactions.
           </p>
+
+          <div class="mt-8 flex justify-center items-center space-x-4">
+            <a href="https://github.com/fikrimastor/memory-library" target="_blank" rel="noopener noreferrer" class="transition-transform hover:scale-105">
+              <img src="https://img.shields.io/github/stars/fikrimastor/memory-library?style=social" alt="Star on GitHub" />
+            </a>
+            <a href="https://github.com/fikrimastor" target="_blank" rel="noopener noreferrer" class="transition-transform hover:scale-105">
+              <img src="https://img.shields.io/badge/Created%20by-@FikriMastor-000000?style=flat&logo=github" alt="Created by @FikriMastor" />
+            </a>
+          </div>
         </div>
 
 
@@ -181,9 +190,6 @@ const dashboardUrl = '/dashboard';
         <div class="text-center text-sm text-slate-500 dark:text-slate-400">
           <p>
             Built with ❤️ using the VILT stack (Vue.js, Inertia.js, Laravel, Tailwind CSS)
-          </p>
-          <p class="mt-2">
-            Memory Library - Your Personal AI Context & Long-Term Memory
           </p>
         </div>
       </div>
