@@ -104,6 +104,7 @@ final class SearchMemoryAction
 
             foreach ($memories as $memory) {
                 $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embeddingJob->embedding);
+                Log::debug("while cosineSimilarity {$query}", compact('similarity', 'threshold'));
 
                 if ($similarity >= $threshold) {
                     $memory->vector_score = $similarity;
@@ -136,8 +137,10 @@ final class SearchMemoryAction
         // Calculate text relevance scores
         foreach ($textMemories as $memory) {
             $textScore = $this->calculateTextRelevanceScore($memory, $words);
+            $threshold = config('embedding.hybrid_search.text_weight');
 
-            if ($textScore > config('embedding.hybrid_search.text_weight')) {
+            if ($textScore > $threshold) {
+                Log::debug("while calculateTextRelevanceScore {$query}", compact('textScore', 'threshold'));
                 $memory->text_score = $textScore;
                 $textResults->put($memory->id, $memory);
             }
