@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { dashboard, login } from '@/routes'
+import { dashboard } from '@/routes'
 import { Head, Link } from '@inertiajs/vue3'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
+const loginUrl = '/auth/github';
 const githubLoginUrl = '/auth/github';
 const dashboardUrl = '/dashboard';
 </script>
@@ -37,8 +38,8 @@ const dashboardUrl = '/dashboard';
             Dashboard
           </Link>
           <template v-else>
-            <Link
-              :href="login()"
+            <a
+              :href="loginUrl"
               class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
             >
                 <svg
@@ -54,7 +55,7 @@ const dashboardUrl = '/dashboard';
                     />
                 </svg>
                 Login with GitHub
-            </Link>
+            </a>
           </template>
         </nav>
       </div>
