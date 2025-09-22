@@ -46,7 +46,7 @@ final class SearchMemoryAction
             } catch (\Exception $e) {
                 // If hybrid search fails and fallback is enabled, use database search
                 if ($fallbackToDatabase) {
-                    \Illuminate\Support\Facades\Log::warning('Hybrid search failed, falling back to database search', [
+                    Log::warning('Hybrid search failed, falling back to database search', [
                         'query' => $query,
                         'error' => $e->getMessage()
                     ]);
@@ -109,7 +109,7 @@ final class SearchMemoryAction
                 }
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::info('Vector search failed in hybrid mode, using text search only', [
+            Log::info('Vector search failed in hybrid mode, using text search only', [
                 'error' => $e->getMessage()
             ]);
         }
@@ -229,7 +229,7 @@ final class SearchMemoryAction
         try {
             $queryEmbedding = $this->embeddingManager->driver()->embed($query);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('Failed to generate query embedding, falling back to database search', [
+            Log::warning('Failed to generate query embedding, falling back to database search', [
                 'query' => $query,
                 'error' => $e->getMessage()
             ]);

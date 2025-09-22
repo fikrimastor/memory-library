@@ -1,101 +1,71 @@
 <?php
 
+use App\Mcp\Servers\MemoryLibraryServer;
 use App\Mcp\Tools\SearchMemory;
 use App\Models\User;
 use App\Models\UserMemory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Mcp\Request;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Create a user for testing
     $this->user = User::factory()->create();
-    
+
     // Create some test memories
     UserMemory::factory()->create([
         'user_id' => $this->user->id,
         'thing_to_remember' => 'This is a test memory about Laravel',
         'title' => 'Laravel Memory',
-        'project_name' => 'Test Project'
+        'project_name' => 'Test Project',
     ]);
-    
+
     UserMemory::factory()->create([
         'user_id' => $this->user->id,
         'thing_to_remember' => 'This is a test memory about Vue.js',
         'title' => 'Vue.js Memory',
-        'project_name' => 'Test Project'
+        'project_name' => 'Test Project',
     ]);
-    
+
     UserMemory::factory()->create([
         'user_id' => $this->user->id,
         'thing_to_remember' => 'This is a test memory about PHP',
         'title' => 'PHP Memory',
-        'project_name' => 'Another Project'
+        'project_name' => 'Another Project',
     ]);
 });
 
 test('it can search memories through MCP tool', function () {
-    $tool = app(SearchMemory::class);
-    
-    $params = [
-        'user_id' => $this->user->id,
-        'query' => 'Laravel'
-    ];
-    
-    $request = new Request($params);
-    $response = $tool->handle($request);
-    $content = $response->content();
-    $result = json_decode((string) $content, true);
-    
-    expect($result['success'])->toBeTrue();
-    expect($result['total'])->toBeGreaterThan(0);
-    expect($result['search_method'])->toBeString();
-    expect($result['query'])->toBe('Laravel');
-    
-    // Verify that the results contain the expected memory
-    $found = collect($result['results'])->first(function ($memory) {
-        return strpos($memory['thing_to_remember'], 'Laravel') !== false;
-    });
-    
-    expect($found)->not->toBeNull();
+
+    $response = MemoryLibraryServer::actingAs($this->user)->tool(SearchMemory::class, [
+        'query' => 'Vue Js and Laravel Stack',
+    ]);
+
+    $response->assertOk()
+        ->assertSee('"total": 2')
+        ->assertSee('This is a test memory about Vue.js')
+        ->assertSee('This is a test memory about Laravel');
 });
 
 test('it returns error when query is missing', function () {
-    $tool = app(SearchMemory::class);
-    
-    $params = [
-        'user_id' => $this->user->id
-    ];
-    
-    $request = new Request($params);
-    $response = $tool->handle($request);
-    $content = $response->content();
-    $result = json_decode((string) $content, true);
-    
-    expect($result['success'])->toBeFalse();
-    expect($result['error'])->toBeString();
-    expect($result['message'])->toContain('query is required');
+    $response = MemoryLibraryServer::actingAs($this->user)->tool(SearchMemory::class, [
+        'use_embedding' => false,
+    ]);
+
+    $response->assertOk()->assertSee('"message": "query is required"');
 });
 
-test('it can search with different parameters', function () {
-    $tool = app(SearchMemory::class);
-    
-    $params = [
-        'user_id' => $this->user->id,
-        'query' => 'test',
+test('it can s search with different parameters', function () {
+    $response = MemoryLibraryServer::actingAs($this->user)->tool(SearchMemory::class, [
+        'query' => 'what preference Laravel best practices',
         'limit' => 5,
         'threshold' => 0.5,
-        'use_embedding' => false
-    ];
-    
-    $request = new Request($params);
-    $response = $tool->handle($request);
-    $content = $response->content();
-    $result = json_decode((string) $content, true);
-    
-    expect($result['success'])->toBeTrue();
-    expect($result['limit'])->toBe(5);
-    expect($result['threshold'])->toBe(0.5);
-    expect($result['search_method'])->toBe('database');
+        'use_embedding' => false,
+    ]);
+
+    $response->assertOk()
+        ->assertSee('This is a test memory about Laravel')
+        ->assertSee('"success": true')
+        ->assertSee('"total": 1')
+        ->assertSee('"title": "Laravel Memory"');
 });

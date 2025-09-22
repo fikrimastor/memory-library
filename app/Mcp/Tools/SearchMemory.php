@@ -5,7 +5,6 @@ namespace App\Mcp\Tools;
 use App\Actions\SearchMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
@@ -13,15 +12,20 @@ use Throwable;
 
 class SearchMemory extends Tool
 {
+    public function __construct(
+        protected SearchMemoryAction $action
+    ) {}
+
     /**
      * The tool's description.
      */
-    protected string $description = 'Search the user\'s persistent memory layer for relevant information, preferences, and past context.
+    protected string $description = 'This tool searches the user\'s persistent memory layer for relevant information, preferences, and past context.
       It uses semantic matching to find connections between your query and stored memories, even when exact keywords don\'t match.
       Use this tool when:
-      1. You need historical context about the user\'s preferences or past interactions
-      2. The user refers to something they previously mentioned or asked you to remember
-      3. You need to verify if specific information about the user exists in memory';
+      1. User explicitly asking ("Remembering...")
+      2. You need historical context about the user\'s preferences or past interactions
+      3. The user refers to something they previously mentioned or asked you to remember
+      4. You need to verify if specific information about the user exists in memory';
 
     /**
      * Handle the tool request.
@@ -31,13 +35,26 @@ class SearchMemory extends Tool
         try {
             $params = $request->all();
 
+            // Get user ID from params or Auth
+            $userId = Auth::id();
+
             // Validate required parameters
             $query = $params['query'] ?? '';
             if (empty($query)) {
-                return Response::text('Failed to search memory: query is required');
+                return Response::json([
+                    'success' => false,
+                    'error' => 'validation_error',
+                    'message' => 'query is required',
+                ]);
             }
 
-            $action = app(SearchMemoryAction::class);
+            if (! $userId) {
+                return Response::json([
+                    'success' => false,
+                    'error' => 'authentication_error',
+                    'message' => 'user_id is required when not authenticated',
+                ]);
+            }
 
             $limit = $params['limit'] ?? 10;
             $threshold = $params['threshold'] ?? 0.7;
@@ -48,8 +65,8 @@ class SearchMemory extends Tool
             $vectorWeight = $params['vector_weight'] ?? config('embedding.hybrid_search.vector_weight', 0.7);
             $textWeight = $params['text_weight'] ?? config('embedding.hybrid_search.text_weight', 0.3);
 
-            $results = $action->handle(
-                userId: Auth::id(),
+            $results = $this->action->handle(
+                userId: $userId,
                 query: $query,
                 limit: $limit,
                 threshold: $threshold,
@@ -69,39 +86,53 @@ class SearchMemory extends Tool
                 // In a future implementation, we could determine if fallback was used
             }
 
+            // Override if use_embedding is explicitly false
+            if ($useEmbedding === false) {
+                $searchMethod = 'database';
+            }
+
             $totalResults = $results->total();
 
-            $text = "Search completed successfully. Found {$totalResults} results using {$searchMethod} search method.";
-
-            if ($useHybridSearch) {
-                $text .= " (Vector: {$vectorWeight}, Text: {$textWeight})";
-            }
-
+            // Format results as array
+            $formattedResults = [];
             foreach ($results as $result) {
-                $text .= "\n\n---\n";
-                if (!empty($result['title'])) {
-                    $text .= "**{$result['title']}**\n";
-                }
+                $formattedResult = [
+                    'id' => $result->id,
+                    'title' => $result->title,
+                    'thing_to_remember' => $result->thing_to_remember,
+                    'tags' => $result->tags ?? [],
+                    'document_type' => $result->document_type,
+                    'project_name' => $result->project_name,
+                    'created_at' => $result->created_at->toISOString(),
+                ];
 
-                // Show search scores for hybrid/vector results
+                // Add search scores if available
                 if (isset($result->hybrid_score)) {
-                    $text .= "🎯 Hybrid Score: " . round($result->hybrid_score, 3);
-                    $text .= " (Vector: " . round($result->vector_score, 3) . ", Text: " . round($result->text_score, 3) . ")\n";
+                    $formattedResult['hybrid_score'] = round($result->hybrid_score, 3);
+                    $formattedResult['vector_score'] = round($result->vector_score, 3);
+                    $formattedResult['text_score'] = round($result->text_score, 3);
                 } elseif (isset($result->similarity)) {
-                    $text .= "🎯 Vector Similarity: " . round($result->similarity, 3) . "\n";
+                    $formattedResult['similarity'] = round($result->similarity, 3);
                 }
 
-                // $text .= "URL: {$result['link']['url']}\n"; TODO: Add URL if applicable
-                $text .= 'Tags: '.implode(', ', $result['tags'])."\n";
-                $text .= 'Document Type: '.str($result['document_type'])->headline()->value()."\n";
-                $text .= 'Project Name: '.$result['project_name']."\n";
-                $text .= 'Created On: '.$result['created_at']."\n";
-                $text .= "Memory:\n\n {$result['thing_to_remember']}\n";
+                $formattedResults[] = $formattedResult;
             }
 
-            return Response::text($text);
+            return Response::json([
+                'total' => $totalResults,
+                'success' => true,
+                'query' => $query,
+                'limit' => $limit,
+                'threshold' => $threshold,
+                'search_method' => $searchMethod,
+                'results' => $formattedResults,
+            ]);
         } catch (Throwable $e) {
-            return Response::text('Failed to search memory: ' . $e->getMessage());
+            return Response::json([
+                'success' => false,
+                'error' => 'search_error',
+                'message' => 'Failed to search memory: '.$e->getMessage(),
+            ]);
         }
     }
 
@@ -116,9 +147,6 @@ class SearchMemory extends Tool
             'query' => $schema->string()->description('The search query')->required(),
             'limit' => $schema->integer()->description('Maximum number of results to return'),
             'threshold' => $schema->number()->description('Similarity threshold for vector search'),
-            'use_embedding' => $schema->boolean()->description('Whether to use embedding search'),
-            'fallback_to_database' => $schema->boolean()->description('Whether to fallback to database search')->required(),
-            'use_hybrid_search' => $schema->boolean()->description('Whether to use hybrid search (combines vector + text search)'),
             'vector_weight' => $schema->number()->description('Weight for vector search results in hybrid mode (0.0-1.0)'),
             'text_weight' => $schema->number()->description('Weight for text search results in hybrid mode (0.0-1.0)'),
         ];
