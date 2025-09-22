@@ -44,18 +44,27 @@ class SearchMemory extends Tool
             $useEmbedding = $params['use_embedding'] ?? true;
             $fallbackToDatabase = $params['fallback_to_database'] ?? true;
 
+            $useHybridSearch = $params['use_hybrid_search'] ?? config('embedding.hybrid_search.enabled', false);
+            $vectorWeight = $params['vector_weight'] ?? config('embedding.hybrid_search.vector_weight', 0.7);
+            $textWeight = $params['text_weight'] ?? config('embedding.hybrid_search.text_weight', 0.3);
+
             $results = $action->handle(
                 userId: Auth::id(),
                 query: $query,
                 limit: $limit,
                 threshold: $threshold,
                 useEmbedding: $useEmbedding,
-                fallbackToDatabase: $fallbackToDatabase
+                fallbackToDatabase: $fallbackToDatabase,
+                useHybridSearch: $useHybridSearch,
+                vectorWeight: $vectorWeight,
+                textWeight: $textWeight
             );
 
             // Determine the actual search method used
             $searchMethod = 'database';
-            if ($useEmbedding) {
+            if ($useHybridSearch) {
+                $searchMethod = 'hybrid';
+            } elseif ($useEmbedding) {
                 $searchMethod = 'vector';
                 // In a future implementation, we could determine if fallback was used
             }
@@ -63,11 +72,25 @@ class SearchMemory extends Tool
             $totalResults = $results->total();
 
             $text = "Search completed successfully. Found {$totalResults} results using {$searchMethod} search method.";
+
+            if ($useHybridSearch) {
+                $text .= " (Vector: {$vectorWeight}, Text: {$textWeight})";
+            }
+
             foreach ($results as $result) {
                 $text .= "\n\n---\n";
                 if (!empty($result['title'])) {
                     $text .= "**{$result['title']}**\n";
                 }
+
+                // Show search scores for hybrid/vector results
+                if (isset($result->hybrid_score)) {
+                    $text .= "🎯 Hybrid Score: " . round($result->hybrid_score, 3);
+                    $text .= " (Vector: " . round($result->vector_score, 3) . ", Text: " . round($result->text_score, 3) . ")\n";
+                } elseif (isset($result->similarity)) {
+                    $text .= "🎯 Vector Similarity: " . round($result->similarity, 3) . "\n";
+                }
+
                 // $text .= "URL: {$result['link']['url']}\n"; TODO: Add URL if applicable
                 $text .= 'Tags: '.implode(', ', $result['tags'])."\n";
                 $text .= 'Document Type: '.str($result['document_type'])->headline()->value()."\n";
@@ -95,6 +118,9 @@ class SearchMemory extends Tool
             'threshold' => $schema->number()->description('Similarity threshold for vector search'),
             'use_embedding' => $schema->boolean()->description('Whether to use embedding search'),
             'fallback_to_database' => $schema->boolean()->description('Whether to fallback to database search')->required(),
+            'use_hybrid_search' => $schema->boolean()->description('Whether to use hybrid search (combines vector + text search)'),
+            'vector_weight' => $schema->number()->description('Weight for vector search results in hybrid mode (0.0-1.0)'),
+            'text_weight' => $schema->number()->description('Weight for text search results in hybrid mode (0.0-1.0)'),
         ];
     }
 }
