@@ -41,7 +41,6 @@ final class SearchMemoryAction
         // If hybrid search is enabled, combine both vector and text search
         if ($useHybridSearch) {
             try {
-                Log::debug("use hybrid search {$userId}");
                 return $this->hybridSearch($userId, $query, $limit, $threshold, $vectorWeight, $textWeight);
             } catch (\Exception $e) {
                 // If hybrid search fails and fallback is enabled, use database search
@@ -60,7 +59,6 @@ final class SearchMemoryAction
         // If we're using embedding and have a working provider, perform vector search
         if ($useEmbedding) {
             try {
-                Log::debug("use embedding {$userId}");
                 return $this->vectorSearch($userId, $query, $limit, $threshold);
             } catch (\Exception $e) {
                 // If vector search fails and fallback is enabled, use database search
@@ -95,13 +93,16 @@ final class SearchMemoryAction
         try {
             $queryEmbedding = $this->embeddingManager->driver()->embed($query);
 
-            $memories = UserMemory::with('embeddingJob')
+            $memories = UserMemory::with(['embeddingJob'])
                 ->where('user_id', $userId)
-                ->whereHas('embeddingJob', fn ($q) => $q->whereNotNull('embedding'))
+                ->whereHas('embeddingJob', fn ($q) =>
+                    $q->whereNotNull('embedding')->where('status', 'completed')
+                )
                 ->get();
 
             foreach ($memories as $memory) {
                 $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embeddingJob->embedding);
+                Log::debug("while cosineSimilarity {$query}", compact('similarity', 'threshold'));
 
                 if ($similarity >= $threshold) {
                     $memory->vector_score = $similarity;
@@ -134,8 +135,10 @@ final class SearchMemoryAction
         // Calculate text relevance scores
         foreach ($textMemories as $memory) {
             $textScore = $this->calculateTextRelevanceScore($memory, $words);
+            $threshold = config('embedding.hybrid_search.text_weight');
 
-            if ($textScore > 0) {
+            if ($textScore > $threshold) {
+                Log::debug("while calculateTextRelevanceScore {$query}", compact('textScore', 'threshold'));
                 $memory->text_score = $textScore;
                 $textResults->put($memory->id, $memory);
             }
@@ -169,6 +172,8 @@ final class SearchMemoryAction
 
         // Sort by hybrid score and paginate
         $sortedResults = $combinedResults->sortByDesc('hybrid_score')->values();
+
+        Log::debug("use hybrid search {$combinedResults->count()}");
 
         return $this->paginateCollection($sortedResults, $limit);
     }
@@ -238,24 +243,38 @@ final class SearchMemoryAction
             return $this->databaseSearch($userId, $query, $limit);
         }
 
+        Log::debug("use embedding {$query}", $queryEmbedding);
+
         // Get all memories with embeddings for this user
-        $memories = UserMemory::with('embeddingJob')
-            ->where('user_id', $userId)
-            ->whereHas('embeddingJob', fn ($query) => $query->whereNotNull('embedding'))
+        $memories = UserMemory::with(['embeddingJob'])
+            ->where('user_id', 1)
+            ->whereHas('embeddingJob', fn ($query) => $query->whereNotNull('embedding')
+                ->where('status', 'completed'))
             ->get();
 
+        Log::debug("load memories {$query}", $memories->only('title')->toArray());
+
         // Calculate similarities and filter by threshold
-        $similarities = $memories->map(function ($memory) use ($queryEmbedding, $threshold) {
+        $similarities = $memories->map(function ($memory) use ($queryEmbedding, $threshold, $query) {
             $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embeddingJob->embedding);
+
+            Log::debug("Similarity: {$query}", [
+                'memory_id' => $memory->id,
+                'similarity' => $similarity,
+                'threshold' => $threshold
+            ]);
             
             // Only include memories that meet the threshold
             if ($similarity >= $threshold) {
+                Log::debug('enter similarity '.$similarity);
                 $memory->similarity = $similarity;
                 return $memory;
             }
             
             return null;
         })->filter()->sortByDesc('similarity');
+
+        Log::debug("Similarity result query: {$query}", $similarities->toArray());
 
         // If no similar memories found, fall back to database search if needed
         if ($similarities->isEmpty()) {
@@ -329,7 +348,7 @@ final class SearchMemoryAction
 
     protected function databaseSearch(int $userId, string $query, int $limit): LengthAwarePaginator
     {
-        Log::debug("use database search {$userId}");
+        Log::debug("use database search: {$query}");
         // Split the query into individual words for better matching
         $words = array_filter(array_map('trim', explode(' ', $query)));
         

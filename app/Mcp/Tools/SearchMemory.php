@@ -97,7 +97,6 @@ class SearchMemory extends Tool
             $formattedResults = [];
             foreach ($results as $result) {
                 $formattedResult = [
-                    'id' => $result->id,
                     'title' => $result->title,
                     'thing_to_remember' => $result->thing_to_remember,
                     'tags' => $result->tags ?? [],
