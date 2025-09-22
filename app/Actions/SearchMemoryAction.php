@@ -9,6 +9,7 @@ use App\Services\EmbeddingManager;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 final class SearchMemoryAction
 {
@@ -40,6 +41,7 @@ final class SearchMemoryAction
         // If hybrid search is enabled, combine both vector and text search
         if ($useHybridSearch) {
             try {
+                Log::debug("use hybrid search {$userId}");
                 return $this->hybridSearch($userId, $query, $limit, $threshold, $vectorWeight, $textWeight);
             } catch (\Exception $e) {
                 // If hybrid search fails and fallback is enabled, use database search
@@ -58,6 +60,7 @@ final class SearchMemoryAction
         // If we're using embedding and have a working provider, perform vector search
         if ($useEmbedding) {
             try {
+                Log::debug("use embedding {$userId}");
                 return $this->vectorSearch($userId, $query, $limit, $threshold);
             } catch (\Exception $e) {
                 // If vector search fails and fallback is enabled, use database search
@@ -326,6 +329,7 @@ final class SearchMemoryAction
 
     protected function databaseSearch(int $userId, string $query, int $limit): LengthAwarePaginator
     {
+        Log::debug("use database search {$userId}");
         // Split the query into individual words for better matching
         $words = array_filter(array_map('trim', explode(' ', $query)));
         
