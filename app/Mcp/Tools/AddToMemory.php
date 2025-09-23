@@ -5,6 +5,7 @@ namespace App\Mcp\Tools;
 use App\Actions\AddToMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
@@ -79,6 +80,8 @@ class AddToMemory extends Tool
                 'embedding_queued' => $generateEmbedding,
             ]);
         } catch (Throwable $e) {
+            Log::error("Try to add memory failed: {$e->getMessage()}");
+
             return Response::json([
                 'success' => false,
                 'error' => 'creation_error',

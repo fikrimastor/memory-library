@@ -8,7 +8,6 @@ import { index as apiTokensIndex, store as apiTokensStore, destroy as apiTokensD
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -138,11 +137,6 @@ const formatDate = (dateString: string) => {
     });
 };
 
-const getTokenStatus = (token: ApiToken) => {
-    return token.last_used_at ? 'Used' : 'Unused';
-};
-
-
 const closeTokenDialog = () => {
     showTokenDialog.value = false;
     createdToken.value = null;
@@ -228,18 +222,9 @@ const closeTokenDialog = () => {
                             <div class="space-y-1">
                                 <div class="flex items-center gap-3">
                                     <h4 class="font-medium text-sm">{{ token.name }}</h4>
-                                    <Badge
-                                        :variant="token.last_used_at ? 'secondary' : 'outline'"
-                                        class="text-xs"
-                                    >
-                                        {{ getTokenStatus(token) }}
-                                    </Badge>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
                                     Created {{ formatDate(token.created_at) }}
-                                    <span v-if="token.last_used_at">
-                                        • Last used {{ formatDate(token.last_used_at) }}
-                                    </span>
                                 </p>
                             </div>
 

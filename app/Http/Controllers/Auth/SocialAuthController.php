@@ -149,47 +149,4 @@ class SocialAuthController extends Controller
             ]);
         }
     }
-
-    /**
-     * Link a GitHub account to the current user.
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function linkProvider(Request $request)
-    {
-        try {
-            // Redirect to GitHub for authentication
-            return Socialite::driver('github')->redirect();
-        } catch (Exception $e) {
-            Log::error('GitHub OAuth link redirect error: '.$e->getMessage());
-
-            return back()->withErrors([
-                'social' => 'Unable to link GitHub account. Please try again.',
-            ]);
-        }
-    }
-
-    /**
-     * Unlink a GitHub account from the current user.
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function unlinkProvider(Request $request)
-    {
-        try {
-            $user = Auth::user();
-
-            $user->socialAccounts()
-                ->where('provider', 'github')
-                ->delete();
-
-            return back()->with('status', 'GitHub account unlinked successfully.');
-        } catch (Exception $e) {
-            Log::error('GitHub OAuth unlink error: '.$e->getMessage());
-
-            return back()->withErrors([
-                'social' => 'Unable to unlink GitHub account. Please try again.',
-            ]);
-        }
-    }
 }

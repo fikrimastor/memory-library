@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { dashboard, login } from '@/routes'
+import { dashboard } from '@/routes'
 import { Head, Link } from '@inertiajs/vue3'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
+const loginUrl = '/auth/github';
 const githubLoginUrl = '/auth/github';
 const dashboardUrl = '/dashboard';
 </script>
@@ -37,8 +38,8 @@ const dashboardUrl = '/dashboard';
             Dashboard
           </Link>
           <template v-else>
-            <Link
-              :href="login()"
+            <a
+              :href="loginUrl"
               class="inline-flex h-9 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
             >
                 <svg
@@ -54,7 +55,7 @@ const dashboardUrl = '/dashboard';
                     />
                 </svg>
                 Login with GitHub
-            </Link>
+            </a>
           </template>
         </nav>
       </div>
@@ -73,6 +74,15 @@ const dashboardUrl = '/dashboard';
             Is AI forgetting who you are, your context, or preferences?
             Memory Library provides seamless context persistence across all your AI interactions.
           </p>
+
+          <div class="mt-8 flex justify-center items-center space-x-4">
+            <a href="https://github.com/fikrimastor/memory-library" target="_blank" rel="noopener noreferrer" class="transition-transform hover:scale-105">
+              <img src="https://img.shields.io/github/stars/fikrimastor/memory-library?style=social" alt="Star on GitHub" />
+            </a>
+            <a href="https://github.com/fikrimastor" target="_blank" rel="noopener noreferrer" class="transition-transform hover:scale-105">
+              <img src="https://img.shields.io/badge/Created%20by-@FikriMastor-000000?style=flat&logo=github" alt="Created by @FikriMastor" />
+            </a>
+          </div>
         </div>
 
 
@@ -180,9 +190,6 @@ const dashboardUrl = '/dashboard';
         <div class="text-center text-sm text-slate-500 dark:text-slate-400">
           <p>
             Built with ❤️ using the VILT stack (Vue.js, Inertia.js, Laravel, Tailwind CSS)
-          </p>
-          <p class="mt-2">
-            Memory Library - Your Personal AI Context & Long-Term Memory
           </p>
         </div>
       </div>

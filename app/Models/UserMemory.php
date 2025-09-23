@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\GenerateEmbeddingJob;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -34,6 +35,17 @@ class UserMemory extends Model
     protected $casts = [
         'tags' => 'array',
     ];
+
+    public static function booted()
+    {
+        static::created(function (UserMemory $memory) {
+            // Log the creation with title and tags
+            \Log::info("Memory created: Title - {$memory->title}, Tags - " . json_encode($memory->tags));
+
+            // Dispatch a job to generate the embedding asynchronously
+            GenerateEmbeddingJob::dispatch($memory);
+        });
+    }
 
     /**
      * Get the user that owns the memory.
