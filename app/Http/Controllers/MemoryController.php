@@ -27,7 +27,7 @@ class MemoryController extends Controller
                 });
             })
             ->latest()
-            ->paginate(10)
+            ->paginate(12)
             ->withQueryString();
 
         return Inertia::render('memories/Index', [

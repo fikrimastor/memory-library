@@ -36,32 +36,14 @@ final class AddToMemoryAction
         string $documentType = 'Memory',
         bool $generateEmbedding = true
     ): UserMemory {
-        return DB::transaction(function () use (
-            $userId,
-            $content,
-            $metadata,
-            $tags,
-            $projectName,
-            $documentType,
-            $generateEmbedding
-        ) {
-            // Create the memory record
-            $memory = UserMemory::create([
-                'user_id' => $userId,
-                'thing_to_remember' => $content,
-                'title' => $metadata['title'] ?? null,
-                'document_type' => $documentType,
-                'project_name' => $projectName,
-                'tags' => $tags,
-            ]);
-
-            // Generate embedding if requested
-            if ($generateEmbedding) {
-                // Dispatch a job to generate the embedding asynchronously
-                GenerateEmbeddingJob::dispatch($memory);
-            }
-
-            return $memory;
-        });
+        // Create the memory record
+        return DB::transaction(fn () => UserMemory::create([
+            'user_id' => $userId,
+            'thing_to_remember' => $content,
+            'title' => $metadata['title'] ?? null,
+            'document_type' => $documentType,
+            'project_name' => $projectName,
+            'tags' => $tags,
+        ]));
     }
 }
