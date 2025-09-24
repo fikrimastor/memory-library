@@ -17,13 +17,7 @@ const githubLoginUrl = '/auth/github';
         <Head title="Register" />
 
         <div class="flex flex-col gap-6">
-
-            <Button
-                as="a"
-                :href="githubLoginUrl"
-                class="w-full"
-                size="lg"
-            >
+            <Button as="a" :href="githubLoginUrl" class="w-full" size="lg">
                 <svg
                     class="mr-3 h-5 w-5"
                     fill="currentColor"
@@ -41,9 +35,7 @@ const githubLoginUrl = '/auth/github';
 
             <div class="text-center text-sm text-muted-foreground">
                 Already have an account?
-                <TextLink
-                    :href="login()"
-                    class="underline underline-offset-4"
+                <TextLink :href="login()" class="underline underline-offset-4"
                     >Sign in with GitHub</TextLink
                 >
             </div>

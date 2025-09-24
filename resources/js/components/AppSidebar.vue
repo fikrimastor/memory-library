@@ -15,7 +15,7 @@ import { dashboard } from '@/routes';
 import { index as memoriesIndex } from '@/routes/memories';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Brain } from 'lucide-vue-next';
+import { BookOpen, Brain, Folder, LayoutGrid } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
