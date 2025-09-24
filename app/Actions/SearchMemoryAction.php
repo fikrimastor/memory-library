@@ -247,7 +247,7 @@ final class SearchMemoryAction
 
         // Get all memories with embeddings for this user
         $memories = UserMemory::with(['embeddingJob'])
-            ->where('user_id', 1)
+            ->where('user_id', $userId)
             ->whereHas('embeddingJob', fn ($query) => $query->whereNotNull('embedding')
                 ->where('status', 'completed'))
             ->get();
