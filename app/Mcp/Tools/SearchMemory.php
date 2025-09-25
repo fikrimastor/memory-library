@@ -78,7 +78,10 @@ class SearchMemory extends Tool
                 textWeight: $textWeight
             );
 
-            return Response::text(json_encode($searchResults));
+            return Response::text(json_encode([
+                'type' => 'text',
+                'text' => json_encode($searchResults),
+            ]));
         } catch (Throwable $e) {
             $metadata = [
                 'success' => false,

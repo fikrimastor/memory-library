@@ -176,8 +176,33 @@ class UserMemory extends Model
         return 'id';
     }
 
+    /**
+     * Accessor for a success message after creating a memory.
+     */
     protected function successMessageCreated(): Attribute
     {
         return Attribute::get(fn () => "Memory added successfully. Memory: {$this->title}. ".json_encode($this->tags));
+    }
+
+    /**
+     * Mutator to ensure document_type is always stored as a slug.
+     */
+    protected function documentType(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+            set: fn ($value) => Str::slug($value, '-'),
+        );
+    }
+
+    /**
+     * Mutator to ensure document_type is always stored as a slug.
+     */
+    protected function projectName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+            set: fn ($value) => Str::slug($value, '-'),
+        );
     }
 }

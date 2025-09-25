@@ -151,6 +151,10 @@ const onMemoryUpdated = (updatedMemory: Memory): void => {
     if (index !== -1) {
         props.memories.data[index] = updatedMemory;
     }
+
+    if (selectedMemory.value?.id === updatedMemory.id) {
+        selectedMemory.value = updatedMemory;
+    }
 };
 
 // Computed

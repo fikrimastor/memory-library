@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_memories', function (Blueprint $table) {
-            $table->string('share_token', 26)->nullable()->unique()->index();
-            $table->enum('visibility', ['private', 'public', 'unlisted'])->default('private')->index();
-            $table->timestamp('shared_at')->nullable();
-            $table->json('share_options')->nullable();
+            $table->string('share_token', 26)->nullable()->unique()->index()->after('tags');
+            $table->enum('visibility', ['private', 'public', 'unlisted'])->default('private')->index()->after('share_token');
+            $table->timestamp('shared_at')->nullable()->after('visibility');
+            $table->json('share_options')->nullable()->after('shared_at');
 
             // Add composite index for efficient querying
             $table->index(['visibility', 'shared_at'], 'idx_visibility_shared_at');
