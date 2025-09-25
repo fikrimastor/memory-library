@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import MemorySharing from '@/components/MemorySharing.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +32,7 @@ import {
     Plus,
     RefreshCw,
     Search,
+    Share2,
     Trash2,
 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
@@ -45,6 +47,9 @@ interface Memory {
     tags: string[] | null;
     created_at: string;
     updated_at: string;
+    visibility: 'private' | 'public' | 'unlisted';
+    share_token?: string;
+    shared_at?: string;
 }
 
 interface PaginatedMemories {
@@ -59,16 +64,16 @@ interface PaginatedMemories {
 
 interface Props {
     memories: PaginatedMemories;
-    filters: {
-        search: string | null;
-    };
+    search?: string | null;
 }
 
 const props = defineProps<Props>();
 
 // Reactive state
-const searchInput = ref(props.filters.search || '');
+const searchInput = ref(props.search || '');
 const isRefreshing = ref(false);
+const shareDialogOpen = ref(false);
+const selectedMemory = ref<Memory | null>(null);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -132,9 +137,25 @@ const formatDate = (dateString: string): string => {
     });
 };
 
+// Methods for sharing
+const openShareDialog = (memory: Memory): void => {
+    selectedMemory.value = memory;
+    shareDialogOpen.value = true;
+};
+
+const onMemoryUpdated = (updatedMemory: Memory): void => {
+    // Find and update the memory in the list
+    const index = props.memories.data.findIndex(
+        (m) => m.id === updatedMemory.id,
+    );
+    if (index !== -1) {
+        props.memories.data[index] = updatedMemory;
+    }
+};
+
 // Computed
 const hasMemories = computed(() => props.memories.data.length > 0);
-const hasFilters = computed(() => props.filters.search);
+const hasFilters = computed(() => props.search);
 </script>
 
 <template>
@@ -252,12 +273,28 @@ const hasFilters = computed(() => props.filters.search);
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem as-child>
                                         <Link
+                                            :href="`/memories/${memory.id}`"
+                                            class="flex items-center gap-2"
+                                        >
+                                            <Search class="h-4 w-4" />
+                                            View
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem as-child>
+                                        <Link
                                             :href="memoriesEdit(memory.id).url"
                                             class="flex items-center gap-2"
                                         >
                                             <Edit class="h-4 w-4" />
                                             Edit
                                         </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        @click="openShareDialog(memory)"
+                                        class="flex items-center gap-2"
+                                    >
+                                        <Share2 class="h-4 w-4" />
+                                        Share
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         @click="deleteMemory(memory)"
@@ -397,6 +434,14 @@ const hasFilters = computed(() => props.filters.search);
                     </Button>
                 </div>
             </div>
+
+            <!-- Share Dialog -->
+            <MemorySharing
+                v-if="selectedMemory"
+                :memory="selectedMemory"
+                v-model:open="shareDialogOpen"
+                @updated="onMemoryUpdated"
+            />
         </div>
     </AppLayout>
 </template>

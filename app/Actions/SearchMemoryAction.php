@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\DTO\MemorySearchResultDTO;
 use App\Models\UserMemory;
 use App\Services\EmbeddingManager;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -37,11 +38,25 @@ final class SearchMemoryAction
         bool $useHybridSearch = false,
         float $vectorWeight = 0.7,
         float $textWeight = 0.3
-    ): LengthAwarePaginator {
+    ): array {
+        // Determine the actual search method used
+        $searchMethod = 'database';
+        if ($useHybridSearch) {
+            $searchMethod = 'hybrid';
+        } elseif ($useEmbedding) {
+            $searchMethod = 'vector';
+        }
+
+        // Override if use_embedding is explicitly false
+        if ($useEmbedding === false) {
+            $searchMethod = 'database';
+        }
+
         // If hybrid search is enabled, combine both vector and text search
         if ($useHybridSearch) {
             try {
-                return $this->hybridSearch($userId, $query, $limit, $threshold, $vectorWeight, $textWeight);
+                $results = $this->hybridSearch($userId, $query, $limit, $threshold, $vectorWeight, $textWeight);
+                return $this->buildResponse($results, $query, $limit, $threshold, $searchMethod);
             } catch (\Exception $e) {
                 // If hybrid search fails and fallback is enabled, use database search
                 if ($fallbackToDatabase) {
@@ -49,7 +64,8 @@ final class SearchMemoryAction
                         'query' => $query,
                         'error' => $e->getMessage()
                     ]);
-                    return $this->databaseSearch($userId, $query, $limit);
+                    $results = $this->databaseSearch($userId, $query, $limit);
+                    return $this->buildResponse($results, $query, $limit, $threshold, 'database');
                 }
 
                 throw $e;
@@ -59,11 +75,13 @@ final class SearchMemoryAction
         // If we're using embedding and have a working provider, perform vector search
         if ($useEmbedding) {
             try {
-                return $this->vectorSearch($userId, $query, $limit, $threshold);
+                $results = $this->vectorSearch($userId, $query, $limit, $threshold);
+                return $this->buildResponse($results, $query, $limit, $threshold, $searchMethod);
             } catch (\Exception $e) {
                 // If vector search fails and fallback is enabled, use database search
                 if ($fallbackToDatabase) {
-                    return $this->databaseSearch($userId, $query, $limit);
+                    $results = $this->databaseSearch($userId, $query, $limit);
+                    return $this->buildResponse($results, $query, $limit, $threshold, 'database');
                 }
 
                 throw $e;
@@ -71,7 +89,8 @@ final class SearchMemoryAction
         }
 
         // Fallback to database search
-        return $this->databaseSearch($userId, $query, $limit);
+        $results = $this->databaseSearch($userId, $query, $limit);
+        return $this->buildResponse($results, $query, $limit, $threshold, $searchMethod);
     }
 
     /**
@@ -101,6 +120,10 @@ final class SearchMemoryAction
                 ->get();
 
             foreach ($memories as $memory) {
+                if (!$memory->embeddingJob || !$memory->embeddingJob->embedding) {
+                    continue;
+                }
+
                 $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embeddingJob->embedding);
                 Log::debug("while cosineSimilarity {$query}", compact('similarity', 'threshold'));
 
@@ -256,6 +279,10 @@ final class SearchMemoryAction
 
         // Calculate similarities and filter by threshold
         $similarities = $memories->map(function ($memory) use ($queryEmbedding, $threshold, $query) {
+            if (!$memory->embeddingJob || !$memory->embeddingJob->embedding) {
+                return null;
+            }
+
             $similarity = $this->cosineSimilarity($queryEmbedding, $memory->embeddingJob->embedding);
 
             Log::debug("Similarity: {$query}", [
@@ -370,5 +397,60 @@ final class SearchMemoryAction
             })
             ->orderByDesc('created_at')
             ->paginate($limit);
+    }
+
+    /**
+     * Build response array from paginated results
+     */
+    protected function buildResponse(
+        LengthAwarePaginator $results,
+        string $query,
+        int $limit,
+        float $threshold,
+        string $searchMethod
+    ): array {
+        $dtoResults = [];
+        foreach ($results->items() as $memory) {
+            // Extract scores safely from dynamic properties
+            $similarity = $this->getScoreFromMemory($memory, 'similarity');
+            $hybrid_score = $this->getScoreFromMemory($memory, 'hybrid_score');
+            $vector_score = $this->getScoreFromMemory($memory, 'vector_score');
+            $text_score = $this->getScoreFromMemory($memory, 'text_score');
+
+            $dto = MemorySearchResultDTO::fromUserMemory(
+                memory: $memory,
+                similarity: $similarity,
+                hybrid_score: $hybrid_score,
+                vector_score: $vector_score,
+                text_score: $text_score
+            );
+
+            $dtoResults[] = $dto->toArray();
+        }
+
+        return [
+            'metadata' => [
+                'total' => $results->total(),
+                'success' => true,
+                'query' => $query,
+                'limit' => $limit,
+                'threshold' => $threshold,
+                'search_method' => $searchMethod,
+            ],
+            'results' => $dtoResults,
+        ];
+    }
+
+    /**
+     * Safely extract score from memory object if it exists as a dynamic property
+     */
+    protected function getScoreFromMemory(object $memory, string $scoreType): ?float
+    {
+        if (!property_exists($memory, $scoreType)) {
+            return null;
+        }
+
+        $value = $memory->$scoreType;
+        return is_numeric($value) ? (float) $value : null;
     }
 }

@@ -313,9 +313,7 @@ onMounted(() => {
                         </CardTitle>
                         <CardDescription>
                             Add this configuration to your
-                            {{
-                                clients.find((c) => c.id === activeTab)?.name
-                            }}
+                            {{ clients.find((c) => c.id === activeTab)?.name }}
                             settings.
                         </CardDescription>
                     </CardHeader>

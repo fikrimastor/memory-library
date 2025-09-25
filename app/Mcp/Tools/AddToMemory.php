@@ -72,21 +72,25 @@ class AddToMemory extends Tool
                 generateEmbedding: $generateEmbedding
             );
 
-            return Response::json([
+            $metadata = [
                 'success' => true,
                 'message' => 'Memory added successfully',
                 'title' => $memory->title,
                 'project_name' => $memory->project_name,
                 'embedding_queued' => $generateEmbedding,
-            ]);
-        } catch (Throwable $e) {
-            Log::error("Try to add memory failed: {$e->getMessage()}");
+            ];
 
-            return Response::json([
+            return Response::text(json_encode($metadata));
+        } catch (Throwable $e) {
+            $metadata = [
                 'success' => false,
                 'error' => 'creation_error',
                 'message' => 'Failed to add memory: '.$e->getMessage(),
-            ]);
+            ];
+
+            Log::error("Try to add memory failed: {$e->getMessage()}", $metadata);
+
+            return Response::text(json_encode($metadata));
         }
     }
 
