@@ -21,6 +21,7 @@ class ApiTokenController extends Controller
         $tokens = $request->user()
             ->tokens()
             ->where('revoked', false)
+            ->whereNotNull('name')
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function (Token $token) {
@@ -29,7 +30,7 @@ class ApiTokenController extends Controller
                     'name' => $token->name,
                     'scopes' => $token->scopes,
                     'created_at' => $token->created_at,
-                    'last_used_at' => $token->last_used_at,
+                    'expires_at' => $token->expires_at,
                 ];
             });
 
