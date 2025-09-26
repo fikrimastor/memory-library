@@ -32,8 +32,12 @@ class FetchMemory extends Tool
         $params = $request->all();
         $recentMemory = $action->handle($user, $params['id']);
 
-        if (!$recentMemory) {
-            return Response::text(json_encode(['error' => 'No memory found for the given ID.']));
+        if (! $recentMemory) {
+            return Response::error(json_encode([
+                'success' => false,
+                'error' => 'not_found',
+                'message' => 'No memory found for the given ID.',
+            ]));
         }
 
         $documentType = str($recentMemory['document_type'])->headline()->value();

@@ -57,7 +57,7 @@ test('it cannot fetch memories through MCP tool from others even public visibili
         'id' => $this->memory1->share_token,
     ]);
 
-    $response->assertOk()->assertSee('No memory found for the given ID.');
+    $response->assertHasErrors(['No memory found for the given ID.']);
 });
 
 test('it cannot fetch memories through MCP tool from others if not public visibility', function () {
@@ -66,6 +66,5 @@ test('it cannot fetch memories through MCP tool from others if not public visibi
         'id' => $this->memory2->share_token,
     ]);
 
-    $response->assertOk()
-        ->assertSee('No memory found for the given ID.');
+    $response->assertHasErrors(['No memory found for the given ID.']);
 });

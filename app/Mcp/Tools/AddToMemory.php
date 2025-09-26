@@ -41,19 +41,19 @@ class AddToMemory extends Tool
             // Validate required parameters
             $content = $params['thing_to_remember'] ?? '';
             if (empty($content)) {
-                return Response::json([
+                return Response::error(json_encode([
                     'success' => false,
                     'error' => 'validation_error',
                     'message' => 'thing_to_remember is required',
-                ]);
+                ]));
             }
 
             if (! $userId) {
-                return Response::json([
+                return Response::error(json_encode([
                     'success' => false,
                     'error' => 'authentication_error',
                     'message' => 'user_id is required when not authenticated',
-                ]);
+                ]));
             }
 
             $memory = $action->handle(
@@ -62,7 +62,7 @@ class AddToMemory extends Tool
                 metadata: $params['metadata'] ?? [],
                 tags: $params['tags'] ?? [],
                 projectName: $params['project_name'] ?? null,
-                documentType: $params['document_type'] ?? 'Memory'
+                documentType: $params['document_type'] ?? 'Memory',
             );
 
             $metadata = [
@@ -82,7 +82,7 @@ class AddToMemory extends Tool
 
             Log::error("Try to add memory failed: {$e->getMessage()}", $metadata);
 
-            return Response::text(json_encode($metadata));
+            return Response::error(json_encode($metadata));
         }
     }
 
@@ -95,10 +95,10 @@ class AddToMemory extends Tool
     {
         return [
             'thing_to_remember' => $schema->string()->description('The content to remember')->required(),
-            'metadata' => $schema->object()->description('Additional metadata to store with the memory like title of the content')->required(),
-            'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory')->required(),
-            'project_name' => $schema->string()->description('The project name to associate with the memory')->required(),
-            'document_type' => $schema->string()->description('The document type of the memory')->required(),
+            'metadata' => $schema->object()->description('Additional metadata to store with the memory like title of the content'),
+            'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory'),
+            'project_name' => $schema->string()->description('The project name to associate with the memory'),
+            'document_type' => $schema->string()->description('The document type of the memory'),
         ];
     }
 }

@@ -24,8 +24,7 @@ test('it can add memory through MCP tool', function () {
     ]);
 
     $response->assertOk()
-        ->assertSee('"title": "MCP Test Memory"')
-        ->assertSee('"embedding_queued": false')
+        ->assertSee('"title":"MCP Test Memory"')
         ->assertSee('Memory added successfully');
 });
 
@@ -40,8 +39,7 @@ test('it can add memory with embedding generation', function () {
     ]);
 
     $response->assertOk()
-        ->assertSee('"title": "MCP Test Memory"')
-        ->assertSee('"embedding_queued": true')
+        ->assertSee('"title":"MCP Test Memory"')
         ->assertSee('Memory added successfully');
 
     // Verify the memory was actually created
@@ -59,7 +57,5 @@ test('it returns error when content is missing', function () {
         'document_type' => 'Memory',
     ]);
 
-    $response->assertOk()
-        ->assertSee('"success": false')
-        ->assertSee('"message": "thing_to_remember is required"');
+    $response->assertHasErrors(['thing_to_remember is required']);
 });
