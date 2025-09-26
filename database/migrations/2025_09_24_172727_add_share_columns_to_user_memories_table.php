@@ -28,10 +28,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_memories', function (Blueprint $table) {
-            $table->dropIndex(['idx_visibility_shared_at']);
+            $table->dropIndex('idx_visibility_shared_at');
             $table->dropIndex(['visibility']);
             $table->dropUnique(['share_token']);
-            $table->dropIndex(['share_token']);
 
             $table->dropColumn([
                 'share_token',

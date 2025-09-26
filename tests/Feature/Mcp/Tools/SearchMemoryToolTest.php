@@ -42,7 +42,7 @@ test('it can search memories through MCP tool', function () {
     ]);
 
     $response->assertOk()
-        ->assertSee('"total": 2')
+        ->assertSee('"total":2')
         ->assertSee('This is a test memory about Vue.js')
         ->assertSee('This is a test memory about Laravel');
 });
@@ -65,7 +65,7 @@ test('it can s search with different parameters', function () {
 
     $response->assertOk()
         ->assertSee('This is a test memory about Laravel')
-        ->assertSee('"success": true')
-        ->assertSee('"total": 1')
-        ->assertSee('"title": "Laravel Memory"');
+        ->assertSee('"success":true')
+        ->assertSee('"total":1')
+        ->assertSee('"title":"Laravel Memory"');
 });

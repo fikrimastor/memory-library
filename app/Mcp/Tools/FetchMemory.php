@@ -32,6 +32,10 @@ class FetchMemory extends Tool
         $params = $request->all();
         $recentMemory = $action->handle($user, $params['id']);
 
+        if (!$recentMemory) {
+            return Response::text(json_encode(['error' => 'No memory found for the given ID.']));
+        }
+
         $documentType = str($recentMemory['document_type'])->headline()->value();
         $data = [
             'id' => $params['id'],
@@ -57,7 +61,7 @@ class FetchMemory extends Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'id' => $schema->string()->description('The a unique ID for the document or search result item')->required(),
+            'id' => $schema->string()->description('The unique share token for the memory item')->required(),
         ];
     }
 }

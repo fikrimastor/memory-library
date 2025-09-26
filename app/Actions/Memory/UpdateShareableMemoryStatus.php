@@ -34,7 +34,7 @@ class UpdateShareableMemoryStatus
     private function makePublic(array $options = []): self
     {
         $this->userMemory->update([
-            'share_token' => $this->share_token ?? $this->userMemory->generateShareToken(),
+            'share_token' => $this->userMemory->share_token ?? $this->userMemory->generateShareToken(),
             'visibility' => 'public',
             'shared_at' => now(),
             'share_options' => $options,
