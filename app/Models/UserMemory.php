@@ -43,8 +43,16 @@ class UserMemory extends Model
         'shared_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'share_url',
+    ];
+
     public static function booted()
     {
+        static::creating(function (UserMemory $memory) {
+            $memory->share_token = Str::ulid();
+        });
+
         static::created(function (UserMemory $memory) {
             // Log the creation with title and tags
             \Log::info("Memory created: Title - {$memory->title}, Tags - ".json_encode($memory->tags));
@@ -115,7 +123,7 @@ class UserMemory extends Model
             return '';
         }
 
-        return url("/share/{$this->share_token}");
+        return $this->share_url;
     }
 
     public function getSanitizedContent(): string
@@ -124,24 +132,24 @@ class UserMemory extends Model
     }
 
     // Helper methods
-    public function isPublic(): bool
+    public function isPublic(): Attribute
     {
-        return $this->visibility === 'public';
+        return Attribute::get(fn () => $this->visibility === 'public');
     }
 
-    public function isPrivate(): bool
+    public function isPrivate(): Attribute
     {
-        return $this->visibility === 'private';
+        return Attribute::get(fn () => $this->visibility === 'private');
     }
 
-    public function isUnlisted(): bool
+    public function isUnlisted(): Attribute
     {
-        return $this->visibility === 'unlisted';
+        return Attribute::get(fn () => $this->visibility === 'unlisted');
     }
 
-    public function isShared(): bool
+    public function isShared(): Attribute
     {
-        return in_array($this->visibility, ['public', 'unlisted']);
+        return Attribute::get(fn () => $this->isUnlisted || $this->is_public);
     }
 
     // Scopes
@@ -204,5 +212,13 @@ class UserMemory extends Model
             get: fn ($value) => $value,
             set: fn ($value) => Str::slug($value, '-'),
         );
+    }
+
+    /**
+     * Accessor for a success message after creating a memory.
+     */
+    protected function shareUrl(): Attribute
+    {
+        return Attribute::get(fn () => url("/share/{$this->share_token}"));
     }
 }

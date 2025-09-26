@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\AddToMemoryAction;
+use App\Actions\Memory\AddToMemoryAction;
 use App\Http\Requests\UpdateMemoryRequest;
 use App\Models\UserMemory;
 use Illuminate\Http\RedirectResponse;
@@ -20,9 +20,7 @@ class MemoryController extends Controller
         $query = $request->input('search');
         $project = $request->input('project');
 
-        $memories = UserMemory::query()
-            ->select(['id', 'title', 'thing_to_remember', 'document_type', 'project_name', 'tags', 'created_at', 'updated_at', 'visibility', 'share_token', 'shared_at'])
-            ->where('user_id', $user->id)
+        $memories = $user->memories()
             ->when($query, function ($q, $query) {
                 $q->where('title', 'like', "%{$query}%")
                     ->orWhere('thing_to_remember', 'like', "%{$query}%")

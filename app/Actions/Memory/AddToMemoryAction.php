@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Actions;
+namespace App\Actions\Memory;
 
-use App\Jobs\GenerateEmbeddingJob;
+use App\Models\User;
 use App\Models\UserMemory;
 use App\Services\EmbeddingManager;
 use Illuminate\Support\Facades\DB;
@@ -37,8 +37,9 @@ final class AddToMemoryAction
         bool $generateEmbedding = true
     ): UserMemory {
         // Create the memory record
-        return DB::transaction(fn () => UserMemory::create([
-            'user_id' => $userId,
+        return DB::transaction(fn () => (User::firstOrFail($userId))
+            ->memories()
+            ->create([
             'thing_to_remember' => $content,
             'title' => $metadata['title'] ?? null,
             'document_type' => $documentType,

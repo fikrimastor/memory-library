@@ -14,7 +14,6 @@ import { useToast } from '@/composables/use-toast';
 import { router } from '@inertiajs/vue3';
 import { Copy, Loader2 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
-import { store as apiTokensStore } from '@/routes/api-tokens';
 
 interface Memory {
     id: number;
@@ -28,6 +27,7 @@ interface Memory {
     visibility: 'private' | 'public' | 'unlisted';
     share_token?: string | null;
     shared_at?: string | null;
+    share_url?: string | null;
 }
 
 interface Props {
@@ -49,15 +49,14 @@ const pendingVisibility = ref<Memory['visibility'] | null>(null);
 const statusMessage = ref<string | null>(null);
 const statusVariant = ref<'success' | 'error'>('success');
 
-const memory = computed(() => memoryState.value);
-
 const shareUrl = computed(() => {
     const current = memoryState.value;
 
     if (current.visibility === 'private' || !current.share_token) {
         return null;
     }
-    return `${window.location.origin}/share/${current.share_token}`;
+
+    return current.share_url;
 });
 
 watch(
@@ -95,6 +94,8 @@ const refreshSharingInfo = async (): Promise<void> => {
 
     const data = await response.json();
 
+    console.log('refreshsharing', data, memoryState.value);
+
     memoryState.value = {
         ...memoryState.value,
         visibility: data.visibility,
@@ -102,7 +103,7 @@ const refreshSharingInfo = async (): Promise<void> => {
         shared_at:
             data.visibility === 'private'
                 ? null
-                : data.shared_at ?? memoryState.value.shared_at ?? null,
+                : (data.shared_at ?? memoryState.value.shared_at ?? null),
     };
 };
 
@@ -116,8 +117,14 @@ const updateVisibility = async (
     memoryState.value = {
         ...memoryState.value,
         visibility,
-        share_token: visibility === 'private' ? undefined : memoryState.value.share_token,
-        shared_at: visibility === 'private' ? null : memoryState.value.shared_at ?? null,
+        share_token:
+            visibility === 'private'
+                ? undefined
+                : memoryState.value.share_token,
+        shared_at:
+            visibility === 'private'
+                ? null
+                : (memoryState.value.shared_at ?? null),
     };
 
     pendingVisibility.value = visibility;
@@ -125,15 +132,20 @@ const updateVisibility = async (
     statusVariant.value = 'success';
     isUpdating.value = true;
 
-    router.post(`/memories/${props.memory.id}/share/${visibility}`,
+    router.post(
+        `/memories/${props.memory.id}/share/${visibility}`,
         {},
         {
             preserveScroll: true,
             onSuccess: async (page) => {
                 try {
                     await refreshSharingInfo();
-                    const flash = (page.props.flash as Record<string, string | undefined>)?.success;
-                    const message = flash || `Memory is now ${memoryState.value.visibility}.`;
+                    const flash = (
+                        page.props.flash as Record<string, string | undefined>
+                    )?.success;
+                    const message =
+                        flash ||
+                        `Memory is now ${memoryState.value.visibility}.`;
 
                     statusVariant.value = 'success';
                     statusMessage.value = message;
@@ -144,7 +156,10 @@ const updateVisibility = async (
                         description: message,
                     });
                 } catch (error) {
-                    console.error('Visibility updated but refreshing info failed:', error);
+                    console.error(
+                        'Visibility updated but refreshing info failed:',
+                        error,
+                    );
                     memoryState.value = previousState;
                     statusVariant.value = 'error';
                     statusMessage.value =
@@ -152,10 +167,16 @@ const updateVisibility = async (
                 }
             },
             onError: (errors) => {
-                console.error('Visibility update error:', errors.name || errors.error);
+                console.error(
+                    'Visibility update error:',
+                    errors.name || errors.error,
+                );
                 memoryState.value = previousState;
                 statusVariant.value = 'error';
-                statusMessage.value = errors.name || errors.error || 'Failed to update memory visibility.';
+                statusMessage.value =
+                    errors.name ||
+                    errors.error ||
+                    'Failed to update memory visibility.';
                 toast({
                     title: 'Error',
                     description: statusMessage.value,
@@ -217,26 +238,26 @@ const copyShareUrl = async () => {
                         <div class="flex items-center gap-2">
                             <Badge
                                 :variant="
-                                    memory.visibility === 'private'
+                                    memoryState.visibility === 'private'
                                         ? 'secondary'
                                         : 'default'
                                 "
                             >
                                 {{
-                                    memory.visibility === 'private'
+                                    memoryState.visibility === 'private'
                                         ? '🔒'
-                                        : memory.visibility === 'public'
+                                        : memoryState.visibility === 'public'
                                           ? '🌍'
                                           : '🔗'
                                 }}
-                                {{ memory.visibility }}
+                                {{ memoryState.visibility }}
                             </Badge>
                         </div>
                         <div class="text-xs text-gray-500">
                             {{
-                                memory.visibility === 'private'
+                                memoryState.visibility === 'private'
                                     ? 'Only you can see this'
-                                    : memory.visibility === 'public'
+                                    : memoryState.visibility === 'public'
                                       ? 'Anyone can find this'
                                       : 'Anyone with link can view'
                             }}
@@ -257,7 +278,7 @@ const copyShareUrl = async () => {
                             :disabled="isUpdating"
                             :class="{
                                 'border-blue-200 bg-blue-50 dark:bg-blue-950':
-                                    memory.visibility === 'private',
+                                    memoryState.visibility === 'private',
                             }"
                         >
                             <Loader2
@@ -275,7 +296,7 @@ const copyShareUrl = async () => {
                             :disabled="isUpdating"
                             :class="{
                                 'border-blue-200 bg-blue-50 dark:bg-blue-950':
-                                    memory.visibility === 'unlisted',
+                                    memoryState.visibility === 'unlisted',
                             }"
                         >
                             <Loader2
@@ -293,7 +314,7 @@ const copyShareUrl = async () => {
                             :disabled="isUpdating"
                             :class="{
                                 'border-blue-200 bg-blue-50 dark:bg-blue-950':
-                                    memory.visibility === 'public',
+                                    memoryState.visibility === 'public',
                             }"
                         >
                             <Loader2
@@ -307,12 +328,16 @@ const copyShareUrl = async () => {
 
                 <!-- Share Link (if shared) -->
                 <div
-                    v-if="memory.visibility !== 'private' && shareUrl"
+                    v-if="memoryState.visibility !== 'private' && shareUrl"
                     class="space-y-2"
                 >
                     <div class="text-sm font-medium">Share Link</div>
                     <div class="flex gap-2">
-                        <Input :value="shareUrl" readonly class="flex-1" />
+                        <Input
+                            v-model="shareUrl"
+                            readonly
+                            class="flex-1 text-current dark:text-white"
+                        />
                         <Button
                             @click="copyShareUrl"
                             variant="outline"

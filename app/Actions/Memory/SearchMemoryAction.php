@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Actions;
+namespace App\Actions\Memory;
 
 use App\DTO\MemorySearchResultDTO;
 use App\Models\UserMemory;

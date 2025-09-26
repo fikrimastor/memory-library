@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Actions;
+namespace App\Actions\Embedding;
 
 use App\Models\UserMemory;
 use App\Services\EmbeddingManager;

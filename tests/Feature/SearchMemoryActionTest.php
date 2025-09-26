@@ -1,10 +1,10 @@
 <?php
 
-use App\Actions\SearchMemoryAction;
+use App\Actions\Memory\SearchMemoryAction;
+use App\Contracts\EmbeddingDriverInterface;
 use App\Models\User;
 use App\Models\UserMemory;
 use App\Services\EmbeddingManager;
-use App\Contracts\EmbeddingDriverInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

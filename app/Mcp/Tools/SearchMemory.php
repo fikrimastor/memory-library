@@ -2,7 +2,7 @@
 
 namespace App\Mcp\Tools;
 
-use App\Actions\SearchMemoryAction;
+use App\Actions\Memory\SearchMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;

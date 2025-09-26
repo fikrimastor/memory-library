@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Memory;
 
 use App\Models\User;
 use App\Services\EmbeddingManager;

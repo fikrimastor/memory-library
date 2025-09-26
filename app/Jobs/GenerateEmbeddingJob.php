@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Actions\GenerateEmbeddingAction;
+use App\Actions\Embedding\GenerateEmbeddingAction;
 use App\Models\EmbeddingJob;
 use App\Models\UserMemory;
 use DateTime;
