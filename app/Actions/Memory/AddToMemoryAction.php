@@ -36,8 +36,10 @@ final class AddToMemoryAction
         string $documentType = 'Memory',
         bool $generateEmbedding = true
     ): UserMemory {
+        $user = User::findOrFail($userId);
+
         // Create the memory record
-        return DB::transaction(fn () => (User::firstOrFail($userId))
+        return DB::transaction(fn () => $user
             ->memories()
             ->create([
             'thing_to_remember' => $content,

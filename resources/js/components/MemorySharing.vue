@@ -24,7 +24,7 @@ interface Memory {
     tags: string[] | null;
     created_at: string;
     updated_at: string;
-    visibility: 'private' | 'public' | 'unlisted';
+    visibility: 'private' | 'public';
     share_token?: string | null;
     shared_at?: string | null;
     share_url?: string | null;
@@ -108,7 +108,7 @@ const refreshSharingInfo = async (): Promise<void> => {
 };
 
 const updateVisibility = async (
-    visibility: 'private' | 'public' | 'unlisted',
+    visibility: 'private' | 'public',
 ) => {
     if (memoryState.value.visibility === visibility || isUpdating.value) return;
 
@@ -286,24 +286,6 @@ const copyShareUrl = async () => {
                                 class="mr-2 h-4 w-4 animate-spin"
                             />
                             🔒 Private - Only you can see this
-                        </Button>
-
-                        <Button
-                            @click="updateVisibility('unlisted')"
-                            variant="outline"
-                            size="sm"
-                            class="w-full justify-start"
-                            :disabled="isUpdating"
-                            :class="{
-                                'border-blue-200 bg-blue-50 dark:bg-blue-950':
-                                    memoryState.visibility === 'unlisted',
-                            }"
-                        >
-                            <Loader2
-                                v-if="pendingVisibility === 'unlisted'"
-                                class="mr-2 h-4 w-4 animate-spin"
-                            />
-                            🔗 Unlisted - Anyone with the link can view
                         </Button>
 
                         <Button

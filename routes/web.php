@@ -16,15 +16,12 @@ Route::resource('memories', App\Http\Controllers\MemoryController::class)
 
 // Public sharing routes (no authentication required)
 Route::prefix('share')->name('memories.public.')->group(function () {
-    Route::get('/', [App\Http\Controllers\PublicMemoryController::class, 'index'])->name('index');
-    Route::get('/search', [App\Http\Controllers\PublicMemoryController::class, 'search'])->name('search');
     Route::get('/{memory:share_token}', [App\Http\Controllers\PublicMemoryController::class, 'show'])->name('show');
 });
 
 // Authenticated sharing routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/memories/{memory}/share/public', [App\Http\Controllers\MemoryController::class, 'makePublic'])->name('memories.share.public');
-    Route::post('/memories/{memory}/share/unlisted', [App\Http\Controllers\MemoryController::class, 'makeUnlisted'])->name('memories.share.unlisted');
     Route::post('/memories/{memory}/share/private', [App\Http\Controllers\MemoryController::class, 'makePrivate'])->name('memories.share.private');
     Route::get('/memories/{memory}/sharing-info', [App\Http\Controllers\MemoryController::class, 'sharingInfo'])->name('memories.sharing.info');
 });

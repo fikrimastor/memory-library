@@ -25,7 +25,6 @@ class UpdateShareableMemoryStatus
         return DB::transaction(function () use ($memory, $status, $options) {
             return match ($status) {
                 'public' => $this->makePublic($options),
-                'unlisted' => $this->makeUnlisted($options),
                 'private' => $this->makePrivate(),
                 default => throw new \InvalidArgumentException("Invalid status: $status"),
             } !== null;
@@ -37,18 +36,6 @@ class UpdateShareableMemoryStatus
         $this->userMemory->update([
             'share_token' => $this->share_token ?? $this->userMemory->generateShareToken(),
             'visibility' => 'public',
-            'shared_at' => now(),
-            'share_options' => $options,
-        ]);
-
-        return $this;
-    }
-
-    private function makeUnlisted(array $options = []): self
-    {
-        $this->userMemory->update([
-            'share_token' => $this->share_token ?? $this->userMemory->generateShareToken(),
-            'visibility' => 'unlisted',
             'shared_at' => now(),
             'share_options' => $options,
         ]);

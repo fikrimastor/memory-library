@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Memory\AddToMemoryAction;
+use App\Actions\Memory\UpdateShareableMemoryStatus;
 use App\Http\Requests\UpdateMemoryRequest;
 use App\Models\UserMemory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +53,7 @@ class MemoryController extends Controller
         return Inertia::render('memories/Create');
     }
 
-    public function store(Request $request, AddToMemoryAction $addToMemoryAction): RedirectResponse
+    public function store(Request $request, AddToMemoryAction $addToMemoryAction): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -62,17 +64,23 @@ class MemoryController extends Controller
             'tags.*' => 'string|max:255',
         ]);
 
-        $memory = $addToMemoryAction->handle(
-            userId: Auth::id(),
-            content: $validated['thing_to_remember'],
-            metadata: ['title' => $validated['title']],
-            tags: $validated['tags'] ?? [],
-            projectName: $validated['project_name'] ?? null,
-            documentType: $validated['document_type'] ?? 'Memory',
-        );
+        try {
+            $memory = $addToMemoryAction->handle(
+                userId: Auth::id(),
+                content: $validated['thing_to_remember'],
+                metadata: ['title' => $validated['title']],
+                tags: $validated['tags'] ?? [],
+                projectName: empty($validated['project_name']) ? null : $validated['project_name'],
+                documentType: empty($validated['document_type']) ? 'Memory' : $validated['document_type'],
+            );
+        } catch (\Throwable $exception) {
+            return Redirect::back()
+                ->withInput()
+                ->withErrors(['error_message' => 'Failed to create memory: '.$exception->getMessage()]);
+        }
 
         return Redirect::route('memories.index')
-            ->with('success', $memory->successMessageCreated);
+            ->with('success', $memory->success_message_created);
     }
 
     public function show(UserMemory $memory): Response
@@ -120,43 +128,27 @@ class MemoryController extends Controller
     {
         $this->authorize('update', $memory);
 
-        $memory->makePublic();
+        try {
+            app(UpdateShareableMemoryStatus::class)->handle($memory, 'public');
 
-        if ($request->wantsJson()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Memory is now public.',
+                    'visibility' => $memory->visibility,
+                    'share_token' => $memory->share_token,
+                    'public_url' => $memory->getPublicUrl(),
+                    'is_shared' => $memory->is_public,
+                ]);
+            }
+        } catch (\Throwable $exception) {
             return response()->json([
-                'success' => true,
-                'message' => 'Memory is now public.',
-                'visibility' => $memory->visibility,
-                'share_token' => $memory->share_token,
-                'public_url' => $memory->getPublicUrl(),
-                'is_shared' => $memory->isShared(),
+                'error' => 'Failed to create memory: '.$exception->getMessage()
             ]);
+
         }
 
         return Redirect::back()->with('success', 'Memory is now public.');
-    }
-
-    /**
-     * Make a memory unlisted.
-     */
-    public function makeUnlisted(Request $request, UserMemory $memory)
-    {
-        $this->authorize('update', $memory);
-
-        $memory->makeUnlisted();
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Memory is now unlisted.',
-                'visibility' => $memory->visibility,
-                'share_token' => $memory->share_token,
-                'public_url' => $memory->getPublicUrl(),
-                'is_shared' => $memory->isShared(),
-            ]);
-        }
-
-        return Redirect::back()->with('success', 'Memory is now unlisted.');
     }
 
     /**
@@ -166,16 +158,22 @@ class MemoryController extends Controller
     {
         $this->authorize('update', $memory);
 
-        $memory->makePrivate();
+        try {
+            app(UpdateShareableMemoryStatus::class)->handle($memory, 'private');
 
-        if ($request->wantsJson()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Memory is now private.',
+                    'visibility' => $memory->visibility,
+                    'share_token' => null,
+                    'public_url' => '',
+                    'is_shared' => $memory->is_public,
+                ]);
+            }
+        } catch (\Throwable $exception) {
             return response()->json([
-                'success' => true,
-                'message' => 'Memory is now private.',
-                'visibility' => $memory->visibility,
-                'share_token' => null,
-                'public_url' => '',
-                'is_shared' => $memory->isShared(),
+                'error' => 'Failed to create memory: '.$exception->getMessage()
             ]);
         }
 
@@ -185,7 +183,7 @@ class MemoryController extends Controller
     /**
      * Get sharing information for a memory.
      */
-    public function sharingInfo(UserMemory $memory): \Illuminate\Http\JsonResponse
+    public function sharingInfo(UserMemory $memory): JsonResponse
     {
         $this->authorize('view', $memory);
 
@@ -193,7 +191,7 @@ class MemoryController extends Controller
             'visibility' => $memory->visibility,
             'share_token' => $memory->share_token,
             'public_url' => $memory->getPublicUrl(),
-            'is_shared' => $memory->isShared(),
+            'is_shared' => $memory->is_public,
         ]);
     }
 }

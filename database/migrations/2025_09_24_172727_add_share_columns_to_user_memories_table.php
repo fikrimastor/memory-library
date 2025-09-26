@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('user_memories', function (Blueprint $table) {
             $table->string('share_token', 26)->nullable()->after('tags')->unique()->index();
-            $table->enum('visibility', ['private', 'public', 'unlisted'])->after('share_token')->default('private')->index();
+            $table->enum('visibility', ['private', 'public'])->after('share_token')->default('private')->index();
             $table->timestamp('shared_at')->nullable()->after('visibility');
             $table->json('share_options')->nullable()->after('shared_at');
 

@@ -25,8 +25,8 @@ import { ref } from 'vue';
 interface MemoryForm {
     title: string;
     thing_to_remember: string;
-    document_type: string | null;
-    project_name: string | null;
+    document_type: string;
+    project_name: string;
     tags: string[];
 }
 
@@ -37,8 +37,8 @@ const isAddingTag = ref(false);
 const form = useForm<MemoryForm>({
     title: '',
     thing_to_remember: '',
-    document_type: null,
-    project_name: null,
+    document_type: '',
+    project_name: '',
     tags: [],
 });
 
@@ -73,7 +73,7 @@ const submit = (): void => {
         onSuccess: () => {
             // Form reset handled by Inertia
         },
-        onError: () => {
+        onError: (errors) => {
             // Errors will be displayed by InputError components
         },
     });
@@ -114,6 +114,9 @@ const cancel = (): void => {
 
                 <form @submit.prevent="submit">
                     <CardContent class="space-y-6">
+                        <!-- General Error -->
+                        <InputError :message="(form.errors as any).error_message" />
+
                         <!-- Title -->
                         <div class="space-y-2">
                             <Label for="title">Title *</Label>

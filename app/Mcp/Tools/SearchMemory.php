@@ -13,9 +13,10 @@ use Throwable;
 
 class SearchMemory extends Tool
 {
-    public function __construct(
-        protected SearchMemoryAction $action
-    ) {}
+    /**
+     * The tool's name.
+     */
+    protected string $name = 'search';
 
     /**
      * The tool's description.
@@ -31,7 +32,7 @@ class SearchMemory extends Tool
     /**
      * Handle the tool request.
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request, SearchMemoryAction $action): Response
     {
         try {
             $params = $request->all();
@@ -66,7 +67,7 @@ class SearchMemory extends Tool
             $vectorWeight = $params['vector_weight'] ?? config('embedding.hybrid_search.vector_weight', 0.7);
             $textWeight = $params['text_weight'] ?? config('embedding.hybrid_search.text_weight', 0.3);
 
-            $searchResults = $this->action->handle(
+            $searchResults = $action->handle(
                 userId: $userId,
                 query: $query,
                 limit: $limit,
@@ -78,10 +79,7 @@ class SearchMemory extends Tool
                 textWeight: $textWeight
             );
 
-            return Response::text(json_encode([
-                'type' => 'text',
-                'text' => json_encode($searchResults),
-            ]));
+            return Response::text(json_encode($searchResults));
         } catch (Throwable $e) {
             $metadata = [
                 'success' => false,

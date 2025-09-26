@@ -1,3 +1,64 @@
+<script setup lang="ts">
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useToast } from '@/composables/use-toast';
+import { Copy } from 'lucide-vue-next';
+
+interface User {
+    id: number;
+    name: string;
+}
+
+interface Memory {
+    id: number;
+    title?: string;
+    thing_to_remember: string;
+    sanitized_content?: string;
+    project_name?: string;
+    document_type?: string;
+    tags?: string[];
+    visibility: 'public' | 'unlisted' | 'private';
+    share_token?: string;
+    shared_at?: string;
+    created_at: string;
+    user?: User;
+    metadata?: {
+        title?: string;
+    };
+}
+
+defineProps<{
+    memory: Memory;
+}>();
+
+const { toast } = useToast();
+
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+};
+
+const copyShareUrl = async () => {
+    try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+            title: 'Link copied!',
+            description: 'Share URL has been copied to clipboard.',
+        });
+    } catch (err) {
+        toast({
+            title: 'Error',
+            description: 'Failed to copy link to clipboard.',
+            variant: 'destructive',
+        });
+    }
+};
+</script>
+
 <template>
     <div
         class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"
@@ -41,9 +102,6 @@
                                         variant="outline"
                                     >
                                         {{ memory.document_type }}
-                                    </Badge>
-                                    <Badge variant="outline">
-                                        👁️ {{ memory.visibility }}
                                     </Badge>
                                 </div>
                             </div>
@@ -108,89 +166,11 @@
                                         )
                                     }}</span
                                 >
-                                <Link
-                                    :href="route('memories.public.index')"
-                                    class="hover:underline"
-                                >
-                                    View more public memories →
-                                </Link>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
-
-            <!-- Back to public memories -->
-            <div class="mt-8 text-center">
-                <Link :href="route('memories.public.index')">
-                    <Button variant="outline">
-                        ← Back to Public Memories
-                    </Button>
-                </Link>
-            </div>
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { useToast } from '@/composables/use-toast';
-import { Link, usePage } from '@inertiajs/vue3';
-import { Copy } from 'lucide-vue-next';
-
-interface User {
-    id: number;
-    name: string;
-}
-
-interface Memory {
-    id: number;
-    title?: string;
-    thing_to_remember: string;
-    sanitized_content?: string;
-    project_name?: string;
-    document_type?: string;
-    tags?: string[];
-    visibility: 'public' | 'unlisted' | 'private';
-    share_token?: string;
-    shared_at?: string;
-    created_at: string;
-    user?: User;
-    metadata?: {
-        title?: string;
-    };
-}
-
-defineProps<{
-    memory: Memory;
-}>();
-
-const page = usePage();
-const { toast } = useToast();
-
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
-};
-
-const copyShareUrl = async () => {
-    try {
-        await navigator.clipboard.writeText(window.location.href);
-        toast({
-            title: 'Link copied!',
-            description: 'Share URL has been copied to clipboard.',
-        });
-    } catch (err) {
-        toast({
-            title: 'Error',
-            description: 'Failed to copy link to clipboard.',
-            variant: 'destructive',
-        });
-    }
-};
-</script>

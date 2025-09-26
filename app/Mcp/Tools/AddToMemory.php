@@ -13,10 +13,6 @@ use Throwable;
 
 class AddToMemory extends Tool
 {
-    public function __construct(
-        protected AddToMemoryAction $action
-    ) {}
-
     /**
      * The tool's description.
      */
@@ -34,7 +30,7 @@ class AddToMemory extends Tool
     /**
      * Handle the tool request.
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request, AddToMemoryAction $action): Response
     {
         try {
             $params = $request->all();
@@ -60,16 +56,13 @@ class AddToMemory extends Tool
                 ]);
             }
 
-            $generateEmbedding = $params['generate_embedding'] ?? true;
-
-            $memory = $this->action->handle(
+            $memory = $action->handle(
                 userId: $userId,
                 content: $content,
                 metadata: $params['metadata'] ?? [],
                 tags: $params['tags'] ?? [],
                 projectName: $params['project_name'] ?? null,
-                documentType: $params['document_type'] ?? 'Memory',
-                generateEmbedding: $generateEmbedding
+                documentType: $params['document_type'] ?? 'Memory'
             );
 
             $metadata = [
@@ -77,7 +70,6 @@ class AddToMemory extends Tool
                 'message' => 'Memory added successfully',
                 'title' => $memory->title,
                 'project_name' => $memory->project_name,
-                'embedding_queued' => $generateEmbedding,
             ];
 
             return Response::text(json_encode($metadata));
@@ -107,7 +99,6 @@ class AddToMemory extends Tool
             'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory')->required(),
             'project_name' => $schema->string()->description('The project name to associate with the memory')->required(),
             'document_type' => $schema->string()->description('The document type of the memory')->required(),
-            'generate_embedding' => $schema->boolean()->description('Whether to generate an embedding for this memory'),
         ];
     }
 }

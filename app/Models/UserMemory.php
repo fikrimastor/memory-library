@@ -84,42 +84,9 @@ class UserMemory extends Model
         return Str::ulid();
     }
 
-    public function makePublic(array $options = []): self
-    {
-        $this->update([
-            'share_token' => $this->share_token ?? $this->generateShareToken(),
-            'visibility' => 'public',
-            'shared_at' => now(),
-            'share_options' => $options,
-        ]);
-
-        return $this;
-    }
-
-    public function makeUnlisted(array $options = []): self
-    {
-        $this->update([
-            'share_token' => $this->share_token ?? $this->generateShareToken(),
-            'visibility' => 'unlisted',
-            'shared_at' => now(),
-            'share_options' => $options,
-        ]);
-
-        return $this;
-    }
-
-    public function makePrivate(): self
-    {
-        $this->update([
-            'visibility' => 'private',
-        ]);
-
-        return $this;
-    }
-
     public function getPublicUrl(): string
     {
-        if (! $this->isShared()) {
+        if (! $this->is_public) {
             return '';
         }
 
@@ -142,16 +109,6 @@ class UserMemory extends Model
         return Attribute::get(fn () => $this->visibility === 'private');
     }
 
-    public function isUnlisted(): Attribute
-    {
-        return Attribute::get(fn () => $this->visibility === 'unlisted');
-    }
-
-    public function isShared(): Attribute
-    {
-        return Attribute::get(fn () => $this->isUnlisted || $this->is_public);
-    }
-
     // Scopes
     public function scopePublic($query)
     {
@@ -163,14 +120,9 @@ class UserMemory extends Model
         return $query->where('visibility', 'private');
     }
 
-    public function scopeUnlisted($query)
-    {
-        return $query->where('visibility', 'unlisted');
-    }
-
     public function scopeShared($query)
     {
-        return $query->whereIn('visibility', ['public', 'unlisted']);
+        return $query->where('visibility', 'public');
     }
 
     // Dynamic route key binding
