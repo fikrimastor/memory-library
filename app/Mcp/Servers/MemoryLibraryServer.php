@@ -14,7 +14,7 @@ class MemoryLibraryServer extends Server
     /**
      * The MCP server's version.
      */
-    protected string $version = '1.0.0';
+    protected string $version = '1.1.0';
 
     /**
      * The MCP server's instructions for the LLM.

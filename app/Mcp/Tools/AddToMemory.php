@@ -4,7 +4,6 @@ namespace App\Mcp\Tools;
 
 use App\Actions\Memory\AddToMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;

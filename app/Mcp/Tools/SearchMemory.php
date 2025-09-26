@@ -4,7 +4,6 @@ namespace App\Mcp\Tools;
 
 use App\Actions\Memory\SearchMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -13,6 +12,11 @@ use Throwable;
 
 class SearchMemory extends Tool
 {
+    /**
+     * The tool's name.
+     */
+    protected string $name = 'advanced-search';
+
     /**
      * The tool's description.
      */
@@ -30,48 +34,46 @@ class SearchMemory extends Tool
     public function handle(Request $request, SearchMemoryAction $action): Response
     {
         try {
-            $params = $request->all();
+            $user = $request->user();
+            $validated = $request->validate([
+                'query' => 'required|string|max:1000',
+                'limit' => 'nullable|integer|min:1|max:10',
+                'threshold' => 'nullable|numeric|min:0|max:1',
+                'use_embedding' => 'nullable|boolean',
+                'fallback_to_database' => 'nullable|boolean',
+                'use_hybrid_search' => 'nullable|boolean',
+                'vector_weight' => 'nullable|numeric|min:0|max:1',
+                'text_weight' => 'nullable|numeric|min:0|max:1',
+            ], [
+                'query.required' => 'Search query is required',
+                'query.max' => 'Search query must be less than 1,000 characters',
+                'limit.min' => 'Limit must be at least 1',
+                'limit.max' => 'Limit cannot exceed 100',
+                'threshold.min' => 'Threshold must be between 0 and 1',
+                'threshold.max' => 'Threshold must be between 0 and 1',
+                'vector_weight.min' => 'Vector weight must be between 0 and 1',
+                'vector_weight.max' => 'Vector weight must be between 0 and 1',
+                'text_weight.min' => 'Text weight must be between 0 and 1',
+                'text_weight.max' => 'Text weight must be between 0 and 1',
+            ]);
 
-            // Get user ID from params or Auth
-            $userId = Auth::id();
-
-            // Validate required parameters
-            $query = $params['query'] ?? '';
-            if (empty($query)) {
-                return Response::error(json_encode([
-                    'success' => false,
-                    'error' => 'validation_error',
-                    'message' => 'query is required',
-                ]));
+            if (! $user instanceof \App\Models\User) {
+                return Response::error('Authentication required to search memory.');
             }
 
-            if (! $userId) {
-                return Response::error(json_encode([
-                    'success' => false,
-                    'error' => 'authentication_error',
-                    'message' => 'user_id is required when not authenticated',
-                ]));
-            }
-
-            $limit = $params['limit'] ?? 10;
-            $threshold = $params['threshold'] ?? 0.7;
-            $useEmbedding = (bool) ($params['use_embedding'] ?? true);
-            $fallbackToDatabase = (bool) ($params['fallback_to_database'] ?? true);
-
-            $useHybridSearch = (bool) ($params['use_hybrid_search'] ?? config('embedding.hybrid_search.enabled', false));
-            $vectorWeight = $params['vector_weight'] ?? config('embedding.hybrid_search.vector_weight', 0.7);
-            $textWeight = $params['text_weight'] ?? config('embedding.hybrid_search.text_weight', 0.3);
+            // Get user ID
+            $userId = $user->id;
 
             $searchResults = $action->handle(
                 userId: $userId,
-                query: $query,
-                limit: $limit,
-                threshold: $threshold,
-                useEmbedding: $useEmbedding,
-                fallbackToDatabase: $fallbackToDatabase,
-                useHybridSearch: $useHybridSearch,
-                vectorWeight: $vectorWeight,
-                textWeight: $textWeight
+                query: $validated['query'],
+                limit: $validated['limit'] ?? 10,
+                threshold: $validated['threshold'] ?? 0.7,
+                useEmbedding: $validated['use_embedding'] ?? true,
+                fallbackToDatabase: $validated['fallback_to_database'] ?? true,
+                useHybridSearch: $validated['use_hybrid_search'] ?? config('embedding.hybrid_search.enabled', false),
+                vectorWeight: $validated['vector_weight'] ?? config('embedding.hybrid_search.vector_weight', 0.7),
+                textWeight: $validated['text_weight'] ?? config('embedding.hybrid_search.text_weight', 0.3)
             );
 
             return Response::text(json_encode($searchResults));
