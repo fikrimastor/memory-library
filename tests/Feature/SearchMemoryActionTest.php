@@ -1,10 +1,10 @@
 <?php
 
-use App\Actions\SearchMemoryAction;
+use App\Actions\Memory\SearchMemoryAction;
+use App\Contracts\EmbeddingDriverInterface;
 use App\Models\User;
 use App\Models\UserMemory;
 use App\Services\EmbeddingManager;
-use App\Contracts\EmbeddingDriverInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -38,8 +38,10 @@ test('it can search memories by content', function () {
         limit: 10
     );
     
-    expect($results)->toHaveCount(1);
-    expect($results->first()->thing_to_remember)->toContain('Laravel');
+    expect($results['results'])->toHaveCount(1);
+    expect($results['results'][0]['thing_to_remember'])->toContain('Laravel');
+    expect($results['metadata']['success'])->toBeTrue();
+    expect($results['metadata']['total'])->toBe(1);
 });
 
 test('it can search memories by title', function () {

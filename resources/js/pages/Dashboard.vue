@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { computed, onMounted, ref } from 'vue';
 
 // Types
 interface Client {
-  id: string
-  name: string
-  description: string
-  icon: string
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,17 +29,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Reactive state
-const uuid = ref<string>('')
-const copiedStates = ref<Record<string, boolean>>({})
-const activeTab = ref<string>('cursor')
+const uuid = ref<string>('');
+const copiedStates = ref<Record<string, boolean>>({});
+const activeTab = ref<string>('cursor');
 
 // Configuration for different AI clients
 const clients: Client[] = [
-  {
-    id: 'cursor',
-    name: 'Cursor',
-    description: 'VS Code fork with AI features',
-    icon: `<svg
+    {
+        id: 'cursor',
+        name: 'Cursor',
+        description: 'VS Code fork with AI features',
+        icon: `<svg
                   height="1.2em"
                   style="flex: none; line-height: 1"
                   viewBox="0 0 24 24"
@@ -84,13 +90,13 @@ const clients: Client[] = [
                       <stop offset=".667" stop-color="#000" stop-opacity=".22"></stop>
                     </linearGradient>
                   </defs>
-                </svg>`
-  },
-  {
-    id: 'claude',
-    name: 'Claude',
-    description: 'Anthropic\'s desktop application',
-    icon: `<svg
+                </svg>`,
+    },
+    {
+        id: 'claude',
+        name: 'Claude',
+        description: "Anthropic's desktop application",
+        icon: `<svg
                   height="1.2em"
                   style="flex: none; line-height: 1"
                   viewBox="0 0 24 24"
@@ -103,13 +109,13 @@ const clients: Client[] = [
                     fill="#D97757"
                     fill-rule="nonzero"
                   ></path>
-                </svg>`
-  },
-  {
-    id: 'qwen',
-    name: 'Qwen',
-    description: 'Qwen Code CLI application',
-    icon: `<svg width="24" height="24" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                </svg>`,
+    },
+    {
+        id: 'qwen',
+        name: 'Qwen',
+        description: 'Qwen Code CLI application',
+        icon: `<svg width="24" height="24" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M174.82 108.75L155.38 75L165.64 57.75C166.46 56.31 166.46 54.53 165.64 53.09L155.38 35.84C154.86 34.91 153.87 34.33 152.78 34.33H114.88L106.14 19.03C105.62 18.1 104.63 17.52 103.54 17.52H83.3C82.21 17.52 81.22 18.1 80.7 19.03L61.26 52.77H41.02C39.93 52.77 38.94 53.35 38.42 54.28L28.16 71.53C27.34 72.97 27.34 74.75 28.16 76.19L45.52 107.5L36.78 122.8C35.96 124.24 35.96 126.02 36.78 127.46L47.04 144.71C47.56 145.64 48.55 146.22 49.64 146.22H87.54L96.28 161.52C96.8 162.45 97.79 163.03 98.88 163.03H119.12C120.21 163.03 121.2 162.45 121.72 161.52L141.16 127.78H158.52C159.61 127.78 160.6 127.2 161.12 126.27L171.38 109.02C172.2 107.58 172.2 105.8 171.38 104.36L174.82 108.75Z" fill="url(#paint0_radial)"/>
         <path d="M119.12 163.03H98.88L87.54 144.71H49.64L61.26 126.39H80.7L38.42 55.29H61.26L83.3 19.03L93.56 37.35L83.3 55.29H161.58L151.32 72.54L170.76 106.28H151.32L141.16 88.34L101.18 163.03H119.12Z" fill="white"/>
         <path d="M127.86 79.83H76.14L101.18 122.11L127.86 79.83Z" fill="url(#paint1_radial)"/>
@@ -123,13 +129,13 @@ const clients: Client[] = [
         <stop offset="1" stop-color="#332E91"/>
         </radialGradient>
         </defs>
-        </svg>`
-  },
-  {
-    id: 'copilot',
-    name: 'Copilot',
-    description: 'AI pair programmer',
-    icon: `<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-github-copilot">
+        </svg>`,
+    },
+    {
+        id: 'copilot',
+        name: 'Copilot',
+        description: 'AI pair programmer',
+        icon: `<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-github-copilot">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
         <path d="M4 18v-5.5c0 -.667 .167 -1.333 .5 -2" />
         <path d="M12 7.5c0 -1 -.01 -4.07 -4 -3.5c-3.5 .5 -4 2.5 -4 3.5c0 1.5 0 4 3 4c4 0 5 -2.5 5 -4z" />
@@ -138,51 +144,51 @@ const clients: Client[] = [
         <path d="M12 7.5l0 -.297l.01 -.269l.027 -.298l.013 -.105l.033 -.215c.014 -.073 .029 -.146 .046 -.22l.06 -.223c.336 -1.118 1.262 -2.237 3.808 -1.873c2.838 .405 3.703 1.797 3.93 2.842l.036 .204c0 .033 .01 .066 .013 .098l.016 .185l0 .171l0 .49l-.015 .394l-.02 .271c-.122 1.366 -.655 2.845 -2.962 2.845c-3.256 0 -4.524 -1.656 -4.883 -3.081l-.053 -.242a3.865 3.865 0 0 1 -.036 -.235l-.021 -.227a3.518 3.518 0 0 1 -.007 -.215z" />
         <path d="M10 15v2" />
         <path d="M14 15v2" />
-        </svg>`
-  }
-]
+        </svg>`,
+    },
+];
 
 // Computed properties
 const mcpUrl = computed(() => {
-  if (!uuid.value) return ''
-  return `${window.location.origin}/mcp`
-})
+    if (!uuid.value) return '';
+    return `${window.location.origin}/mcp`;
+});
 
 const configs = computed(() => ({
-  cursor: {
-    title: 'Cursor Configuration',
-    content: `{
+    cursor: {
+        title: 'Cursor Configuration',
+        content: `{
   "mcpServers": {
     "memory-library": {
       "url": "${mcpUrl.value}"
     }
   }
-}`
-  },
-  claude: {
-    title: 'Claude Configuration',
-    content: `{
+}`,
+    },
+    claude: {
+        title: 'Claude Configuration',
+        content: `{
   "mcpServers": {
     "memory-library": {
       "type": "http",
       "url": "${mcpUrl.value}"
     }
   }
-}`
-  },
-  qwen: {
-    title: 'Qwen Code Configuration',
-    content: `{
+}`,
+    },
+    qwen: {
+        title: 'Qwen Code Configuration',
+        content: `{
   "mcpServers": {
     "memory-library": {
       "httpUrl": "${mcpUrl.value}"
     }
   }
-}`
-  },
-  copilot: {
-    title: 'GitHub Copilot Configuration',
-    content: `{
+}`,
+    },
+    copilot: {
+        title: 'GitHub Copilot Configuration',
+        content: `{
   "mcpServers": {
     "memory-library": {
       "type": "http",
@@ -195,46 +201,46 @@ const configs = computed(() => ({
       }
     }
   }
-}`
-  }
-}))
+}`,
+    },
+}));
 
 // Methods
 const generateUUID = (): string => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = Math.random() * 16 | 0
-    const v = c === 'x' ? r : (r & 0x3 | 0x8)
-    return v.toString(16)
-  })
-}
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+};
 
 const copyToClipboard = async (text: string, key: string): Promise<void> => {
-  try {
-    await navigator.clipboard.writeText(text)
-    copiedStates.value[key] = true
-    setTimeout(() => {
-      copiedStates.value[key] = false
-    }, 2000)
-  } catch (err) {
-    console.error('Failed to copy text: ', err)
-  }
-}
+    try {
+        await navigator.clipboard.writeText(text);
+        copiedStates.value[key] = true;
+        setTimeout(() => {
+            copiedStates.value[key] = false;
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy text: ', err);
+    }
+};
 
 const generateNewUUID = (): void => {
-  const newUuid = generateUUID()
-  uuid.value = newUuid
-  localStorage.setItem('memory-library-uuid', newUuid)
-}
+    const newUuid = generateUUID();
+    uuid.value = newUuid;
+    localStorage.setItem('memory-library-uuid', newUuid);
+};
 
 // Lifecycle
 onMounted(() => {
-  const stored = localStorage.getItem('memory-library-uuid')
-  if (stored) {
-    uuid.value = stored
-  } else {
-    generateNewUUID()
-  }
-})
+    const stored = localStorage.getItem('memory-library-uuid');
+    if (stored) {
+        uuid.value = stored;
+    } else {
+        generateNewUUID();
+    }
+});
 </script>
 
 <template>
@@ -246,27 +252,32 @@ onMounted(() => {
         >
             <!-- AI Client Setup Section -->
             <div class="mt-8">
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-slate-900 dark:text-slate-100">
+                <div class="mb-8 text-center">
+                    <h2
+                        class="text-3xl font-bold text-slate-900 dark:text-slate-100"
+                    >
                         AI Client Setup
                     </h2>
                     <p class="mt-2 text-slate-600 dark:text-slate-400">
-                        Choose your AI client and copy the configuration to get started.
+                        Choose your AI client and copy the configuration to get
+                        started.
                     </p>
                 </div>
 
                 <!-- Client Tabs -->
-                <div class="flex justify-center mb-8">
-                    <div class="inline-flex h-10 items-center justify-center rounded-md bg-slate-100 p-1 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                <div class="mb-8 flex justify-center">
+                    <div
+                        class="inline-flex h-10 items-center justify-center rounded-md bg-slate-100 p-1 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                    >
                         <button
                             v-for="client in clients"
                             :key="client.id"
                             @click="activeTab = client.id"
                             :class="[
-                                'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300',
+                                'inline-flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium whitespace-nowrap ring-offset-white transition-all focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300',
                                 activeTab === client.id
                                     ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-slate-50'
-                                    : 'hover:bg-white/60 hover:text-slate-900 dark:hover:bg-slate-800/60 dark:hover:text-slate-50'
+                                    : 'hover:bg-white/60 hover:text-slate-900 dark:hover:bg-slate-800/60 dark:hover:text-slate-50',
                             ]"
                         >
                             <span class="mr-2" v-html="client.icon"></span>
@@ -281,23 +292,36 @@ onMounted(() => {
                         <CardTitle class="flex items-center justify-between">
                             <span>{{ configs[activeTab].title }}</span>
                             <Button
-                                @click="copyToClipboard(configs[activeTab].content, `config-${activeTab}`)"
+                                @click="
+                                    copyToClipboard(
+                                        configs[activeTab].content,
+                                        `config-${activeTab}`,
+                                    )
+                                "
                                 variant="outline"
                                 size="sm"
                                 class="ml-4"
                             >
-                                <span v-if="copiedStates[`config-${activeTab}`]" class="mr-2">✓</span>
+                                <span
+                                    v-if="copiedStates[`config-${activeTab}`]"
+                                    class="mr-2"
+                                    >✓</span
+                                >
                                 <span v-else class="mr-2">📋</span>
                                 Copy Config
                             </Button>
                         </CardTitle>
                         <CardDescription>
-                            Add this configuration to your {{ clients.find(c => c.id === activeTab)?.name }} settings.
+                            Add this configuration to your
+                            {{ clients.find((c) => c.id === activeTab)?.name }}
+                            settings.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div class="relative">
-                            <pre class="overflow-x-auto rounded-md bg-slate-100 p-4 text-sm dark:bg-slate-800"><code class="language-json">{{ configs[activeTab].content }}</code></pre>
+                            <pre
+                                class="overflow-x-auto rounded-md bg-slate-100 p-4 text-sm dark:bg-slate-800"
+                            ><code class="language-json">{{ configs[activeTab].content }}</code></pre>
                         </div>
                     </CardContent>
                 </Card>

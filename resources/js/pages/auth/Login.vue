@@ -26,13 +26,7 @@ defineProps<{
         </div>
 
         <div class="flex flex-col gap-6">
-
-            <Button
-                as="a"
-                :href="githubLoginUrl"
-                class="w-full"
-                size="lg"
-            >
+            <Button as="a" :href="githubLoginUrl" class="w-full" size="lg">
                 <svg
                     class="mr-3 h-5 w-5"
                     fill="currentColor"

@@ -2,9 +2,10 @@
 
 namespace App\Mcp\Tools;
 
-use App\Actions\SearchMemoryAction;
+use App\Actions\Memory\SearchMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
@@ -12,9 +13,10 @@ use Throwable;
 
 class SearchMemory extends Tool
 {
-    public function __construct(
-        protected SearchMemoryAction $action
-    ) {}
+    /**
+     * The tool's name.
+     */
+    protected string $name = 'search';
 
     /**
      * The tool's description.
@@ -30,7 +32,7 @@ class SearchMemory extends Tool
     /**
      * Handle the tool request.
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request, SearchMemoryAction $action): Response
     {
         try {
             $params = $request->all();
@@ -65,7 +67,7 @@ class SearchMemory extends Tool
             $vectorWeight = $params['vector_weight'] ?? config('embedding.hybrid_search.vector_weight', 0.7);
             $textWeight = $params['text_weight'] ?? config('embedding.hybrid_search.text_weight', 0.3);
 
-            $results = $this->action->handle(
+            $searchResults = $action->handle(
                 userId: $userId,
                 query: $query,
                 limit: $limit,
@@ -77,61 +79,17 @@ class SearchMemory extends Tool
                 textWeight: $textWeight
             );
 
-            // Determine the actual search method used
-            $searchMethod = 'database';
-            if ($useHybridSearch) {
-                $searchMethod = 'hybrid';
-            } elseif ($useEmbedding) {
-                $searchMethod = 'vector';
-                // In a future implementation, we could determine if fallback was used
-            }
-
-            // Override if use_embedding is explicitly false
-            if ($useEmbedding === false) {
-                $searchMethod = 'database';
-            }
-
-            $totalResults = $results->total();
-
-            // Format results as array
-            $formattedResults = [];
-            foreach ($results as $result) {
-                $formattedResult = [
-                    'title' => $result->title,
-                    'thing_to_remember' => $result->thing_to_remember,
-                    'tags' => $result->tags ?? [],
-                    'document_type' => $result->document_type,
-                    'project_name' => $result->project_name,
-                    'created_at' => $result->created_at->toISOString(),
-                ];
-
-                // Add search scores if available
-                if (isset($result->hybrid_score)) {
-                    $formattedResult['hybrid_score'] = round($result->hybrid_score, 3);
-                    $formattedResult['vector_score'] = round($result->vector_score, 3);
-                    $formattedResult['text_score'] = round($result->text_score, 3);
-                } elseif (isset($result->similarity)) {
-                    $formattedResult['similarity'] = round($result->similarity, 3);
-                }
-
-                $formattedResults[] = $formattedResult;
-            }
-
-            return Response::json([
-                'total' => $totalResults,
-                'success' => true,
-                'query' => $query,
-                'limit' => $limit,
-                'threshold' => $threshold,
-                'search_method' => $searchMethod,
-                'results' => $formattedResults,
-            ]);
+            return Response::text(json_encode($searchResults));
         } catch (Throwable $e) {
-            return Response::json([
+            $metadata = [
                 'success' => false,
                 'error' => 'search_error',
                 'message' => 'Failed to search memory: '.$e->getMessage(),
-            ]);
+            ];
+
+            Log::error("Try to add memory failed: {$e->getMessage()}", $metadata);
+
+            return Response::text(json_encode($metadata));
         }
     }
 

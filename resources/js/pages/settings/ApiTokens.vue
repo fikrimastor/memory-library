@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import {
+    destroy as apiTokensDestroy,
+    index as apiTokensIndex,
+    store as apiTokensStore,
+} from '@/routes/api-tokens';
 import { Head, router } from '@inertiajs/vue3';
-import { PlusIcon, TrashIcon } from 'lucide-vue-next';
 import { useClipboard } from '@vueuse/core';
-import { index as apiTokensIndex, store as apiTokensStore, destroy as apiTokensDestroy } from '@/routes/api-tokens';
+import { PlusIcon, TrashIcon } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
     Dialog,
     DialogContent,
@@ -19,6 +21,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem } from '@/types';
@@ -28,7 +32,7 @@ interface ApiToken {
     name: string;
     scopes: string[];
     created_at: string;
-    last_used_at: string | null;
+    expires_at: string | null;
 }
 
 interface Props {
@@ -74,25 +78,30 @@ const createToken = async () => {
     createError.value = null;
 
     try {
-        router.post(apiTokensStore().url, {
-            name: tokenName.value.trim(),
-        }, {
-            onSuccess: (page) => {
-                const flashData = page.props.flash as any;
-                if (flashData?.token) {
-                    createdToken.value = flashData.token;
-                    showTokenDialog.value = true;
-                }
-                showCreateDialog.value = false;
-                tokenName.value = '';
+        router.post(
+            apiTokensStore().url,
+            {
+                name: tokenName.value.trim(),
             },
-            onError: (errors) => {
-                createError.value = errors.name || errors.error || 'Failed to create token';
+            {
+                onSuccess: (page) => {
+                    const flashData = page.props.flash as any;
+                    if (flashData?.token) {
+                        createdToken.value = flashData.token;
+                        showTokenDialog.value = true;
+                    }
+                    showCreateDialog.value = false;
+                    tokenName.value = '';
+                },
+                onError: (errors) => {
+                    createError.value =
+                        errors.name || errors.error || 'Failed to create token';
+                },
+                onFinish: () => {
+                    isCreating.value = false;
+                },
             },
-            onFinish: () => {
-                isCreating.value = false;
-            }
-        });
+        );
     } catch {
         createError.value = 'Failed to create token';
         isCreating.value = false;
@@ -120,7 +129,7 @@ const revokeToken = async () => {
                 isRevoking.value = false;
                 showRevokeDialog.value = false;
                 tokenToRevoke.value = null;
-            }
+            },
         });
     } catch {
         revokeError.value = 'Failed to revoke token';
@@ -155,7 +164,7 @@ const closeTokenDialog = () => {
                         title="API Tokens"
                         description="Manage API tokens for accessing your account programmatically"
                     />
-                    
+
                     <Dialog v-model:open="showCreateDialog">
                         <DialogTrigger asChild>
                             <Button class="gap-2">
@@ -167,10 +176,11 @@ const closeTokenDialog = () => {
                             <DialogHeader>
                                 <DialogTitle>Create API Token</DialogTitle>
                                 <DialogDescription>
-                                    Give your token a descriptive name to help you identify it later.
+                                    Give your token a descriptive name to help
+                                    you identify it later.
                                 </DialogDescription>
                             </DialogHeader>
-                            
+
                             <div class="space-y-4">
                                 <div class="grid gap-2">
                                     <Label for="token-name">Token Name</Label>
@@ -181,7 +191,10 @@ const closeTokenDialog = () => {
                                         :disabled="isCreating"
                                         @keydown.enter="createToken"
                                     />
-                                    <InputError v-if="createError" :message="createError" />
+                                    <InputError
+                                        v-if="createError"
+                                        :message="createError"
+                                    />
                                 </div>
                             </div>
 
@@ -197,7 +210,11 @@ const closeTokenDialog = () => {
                                     @click="createToken"
                                     :disabled="isCreating || !tokenName.trim()"
                                 >
-                                    {{ isCreating ? 'Creating...' : 'Create Token' }}
+                                    {{
+                                        isCreating
+                                            ? 'Creating...'
+                                            : 'Create Token'
+                                    }}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -206,10 +223,12 @@ const closeTokenDialog = () => {
 
                 <!-- Token List -->
                 <div class="space-y-4">
-                    <div v-if="tokens.length === 0" class="text-center py-12">
+                    <div v-if="tokens.length === 0" class="py-12 text-center">
                         <div class="text-muted-foreground">
                             <p class="text-sm">No API tokens found.</p>
-                            <p class="text-xs mt-1">Create your first token to get started.</p>
+                            <p class="mt-1 text-xs">
+                                Create your first token to get started.
+                            </p>
                         </div>
                     </div>
 
@@ -217,11 +236,13 @@ const closeTokenDialog = () => {
                         <div
                             v-for="token in tokens"
                             :key="token.id"
-                            class="flex items-center justify-between p-4 border rounded-lg bg-card"
+                            class="flex items-center justify-between rounded-lg border bg-card p-4"
                         >
                             <div class="space-y-1">
                                 <div class="flex items-center gap-3">
-                                    <h4 class="font-medium text-sm">{{ token.name }}</h4>
+                                    <h4 class="text-sm font-medium">
+                                        {{ token.name }}
+                                    </h4>
                                 </div>
                                 <p class="text-xs text-muted-foreground">
                                     Created {{ formatDate(token.created_at) }}
@@ -243,32 +264,53 @@ const closeTokenDialog = () => {
 
                 <!-- Show Token Dialog -->
                 <Dialog v-model:open="showTokenDialog">
-                    <DialogContent class="sm:max-w-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                    <DialogContent
+                        class="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden sm:max-w-2xl"
+                    >
                         <DialogHeader class="flex-shrink-0">
                             <DialogTitle>API Token Created</DialogTitle>
                             <DialogDescription>
-                                Copy your new API token. For security reasons, it won't be shown again.
+                                Copy your new API token. For security reasons,
+                                it won't be shown again.
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div class="space-y-4 flex-1 overflow-y-auto min-h-0">
-                            <div v-if="($page.props.flash as any)?.token" class="p-4 bg-muted rounded-lg border">
-                                <code class="text-xs sm:text-sm font-mono break-all leading-relaxed block">{{ ($page.props.flash as any)?.token }}</code>
+                        <div class="min-h-0 flex-1 space-y-4 overflow-y-auto">
+                            <div
+                                v-if="($page.props.flash as any)?.token"
+                                class="rounded-lg border bg-muted p-4"
+                            >
+                                <code
+                                    class="block font-mono text-xs leading-relaxed break-all sm:text-sm"
+                                    >{{
+                                        ($page.props.flash as any)?.token
+                                    }}</code
+                                >
                             </div>
                             <p class="text-sm text-muted-foreground">
-                                Make sure to copy your API token now. You won't be able to see it again!
+                                Make sure to copy your API token now. You won't
+                                be able to see it again!
                             </p>
                         </div>
 
-                        <DialogFooter class="flex-shrink-0 flex-col-reverse sm:flex-row gap-2">
+                        <DialogFooter
+                            class="flex-shrink-0 flex-col-reverse gap-2 sm:flex-row"
+                        >
                             <Button
                                 variant="outline"
-                                @click="copy(($page.props.flash as any)?.token || '')"
+                                @click="
+                                    copy(
+                                        ($page.props.flash as any)?.token || '',
+                                    )
+                                "
                                 class="w-full sm:w-auto"
                             >
                                 {{ copied ? 'Copied!' : 'Copy Token' }}
                             </Button>
-                            <div v-if="!isSupported" class="text-xs text-muted-foreground">
+                            <div
+                                v-if="!isSupported"
+                                class="text-xs text-muted-foreground"
+                            >
                                 Clipboard not supported
                             </div>
                             <Button
@@ -287,13 +329,20 @@ const closeTokenDialog = () => {
                         <DialogHeader>
                             <DialogTitle>Revoke API Token</DialogTitle>
                             <DialogDescription>
-                                Are you sure you want to revoke the token "{{ tokenToRevoke?.name }}"? 
-                                This action cannot be undone and any applications using this token will lose access.
+                                Are you sure you want to revoke the token "{{
+                                    tokenToRevoke?.name
+                                }}"? This action cannot be undone and any
+                                applications using this token will lose access.
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div v-if="revokeError" class="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-                            <p class="text-sm text-destructive">{{ revokeError }}</p>
+                        <div
+                            v-if="revokeError"
+                            class="rounded-md border border-destructive/20 bg-destructive/10 p-3"
+                        >
+                            <p class="text-sm text-destructive">
+                                {{ revokeError }}
+                            </p>
                         </div>
 
                         <DialogFooter>
@@ -309,7 +358,9 @@ const closeTokenDialog = () => {
                                 @click="revokeToken"
                                 :disabled="isRevoking"
                             >
-                                {{ isRevoking ? 'Revoking...' : 'Revoke Token' }}
+                                {{
+                                    isRevoking ? 'Revoking...' : 'Revoke Token'
+                                }}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

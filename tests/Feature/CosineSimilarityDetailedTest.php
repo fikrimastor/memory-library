@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\SearchMemoryAction;
+use App\Actions\Memory\SearchMemoryAction;
 use App\Models\User;
 use App\Services\EmbeddingManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -13,7 +13,9 @@ defineProps<Props>();
 </script>
 
 <template>
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+    <svg
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
         :class="className"
         v-bind="$attrs"
     >
@@ -21,22 +23,94 @@ defineProps<Props>();
         <circle cx="50" cy="50" r="40" fill="#dc2626" />
 
         <!-- Memory/storage symbol - abstract stack -->
-        <rect x="35" y="30" width="30" height="4" rx="2" fill="white" opacity="0.9"/>
-        <rect x="35" y="38" width="30" height="4" rx="2" fill="white" opacity="0.7"/>
-        <rect x="35" y="46" width="30" height="4" rx="2" fill="white" opacity="0.9"/>
-        <rect x="35" y="54" width="30" height="4" rx="2" fill="white" opacity="0.7"/>
-        <rect x="35" y="62" width="30" height="4" rx="2" fill="white" opacity="0.9"/>
+        <rect
+            x="35"
+            y="30"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.9"
+        />
+        <rect
+            x="35"
+            y="38"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.7"
+        />
+        <rect
+            x="35"
+            y="46"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.9"
+        />
+        <rect
+            x="35"
+            y="54"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.7"
+        />
+        <rect
+            x="35"
+            y="62"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.9"
+        />
 
         <!-- Simple connection dots -->
-        <circle cx="25" cy="40" r="2" fill="white" opacity="0.6"/>
-        <circle cx="75" cy="40" r="2" fill="white" opacity="0.6"/>
-        <circle cx="25" cy="60" r="2" fill="white" opacity="0.6"/>
-        <circle cx="75" cy="60" r="2" fill="white" opacity="0.6"/>
+        <circle cx="25" cy="40" r="2" fill="white" opacity="0.6" />
+        <circle cx="75" cy="40" r="2" fill="white" opacity="0.6" />
+        <circle cx="25" cy="60" r="2" fill="white" opacity="0.6" />
+        <circle cx="75" cy="60" r="2" fill="white" opacity="0.6" />
 
         <!-- Subtle connecting lines -->
-        <line x1="27" y1="40" x2="35" y2="38" stroke="white" stroke-width="1" opacity="0.3"/>
-        <line x1="27" y1="60" x2="35" y2="62" stroke="white" stroke-width="1" opacity="0.3"/>
-        <line x1="73" y1="40" x2="65" y2="38" stroke="white" stroke-width="1" opacity="0.3"/>
-        <line x1="73" y1="60" x2="65" y2="62" stroke="white" stroke-width="1" opacity="0.3"/>
+        <line
+            x1="27"
+            y1="40"
+            x2="35"
+            y2="38"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
+        />
+        <line
+            x1="27"
+            y1="60"
+            x2="35"
+            y2="62"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
+        />
+        <line
+            x1="73"
+            y1="40"
+            x2="65"
+            y2="38"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
+        />
+        <line
+            x1="73"
+            y1="60"
+            x2="65"
+            y2="62"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
+        />
     </svg>
 </template>

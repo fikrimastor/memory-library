@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\AddToMemoryAction;
+use App\Actions\Memory\AddToMemoryAction;
 use App\Models\User;
 use App\Models\UserMemory;
 use Illuminate\Foundation\Testing\RefreshDatabase;

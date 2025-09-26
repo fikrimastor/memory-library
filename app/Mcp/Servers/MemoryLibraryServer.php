@@ -29,6 +29,7 @@ class MemoryLibraryServer extends Server
     protected array $tools = [
         \App\Mcp\Tools\AddToMemory::class,
         \App\Mcp\Tools\SearchMemory::class,
+        \App\Mcp\Tools\FetchMemory::class,
     ];
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Mcp\Tools;
 
-use App\Actions\AddToMemoryAction;
+use App\Actions\Memory\AddToMemoryAction;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -13,10 +13,6 @@ use Throwable;
 
 class AddToMemory extends Tool
 {
-    public function __construct(
-        protected AddToMemoryAction $action
-    ) {}
-
     /**
      * The tool's description.
      */
@@ -34,7 +30,7 @@ class AddToMemory extends Tool
     /**
      * Handle the tool request.
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request, AddToMemoryAction $action): Response
     {
         try {
             $params = $request->all();
@@ -60,33 +56,33 @@ class AddToMemory extends Tool
                 ]);
             }
 
-            $generateEmbedding = $params['generate_embedding'] ?? true;
-
-            $memory = $this->action->handle(
+            $memory = $action->handle(
                 userId: $userId,
                 content: $content,
                 metadata: $params['metadata'] ?? [],
                 tags: $params['tags'] ?? [],
                 projectName: $params['project_name'] ?? null,
-                documentType: $params['document_type'] ?? 'Memory',
-                generateEmbedding: $generateEmbedding
+                documentType: $params['document_type'] ?? 'Memory'
             );
 
-            return Response::json([
+            $metadata = [
                 'success' => true,
                 'message' => 'Memory added successfully',
                 'title' => $memory->title,
                 'project_name' => $memory->project_name,
-                'embedding_queued' => $generateEmbedding,
-            ]);
-        } catch (Throwable $e) {
-            Log::error("Try to add memory failed: {$e->getMessage()}");
+            ];
 
-            return Response::json([
+            return Response::text(json_encode($metadata));
+        } catch (Throwable $e) {
+            $metadata = [
                 'success' => false,
                 'error' => 'creation_error',
                 'message' => 'Failed to add memory: '.$e->getMessage(),
-            ]);
+            ];
+
+            Log::error("Try to add memory failed: {$e->getMessage()}", $metadata);
+
+            return Response::text(json_encode($metadata));
         }
     }
 
@@ -103,7 +99,6 @@ class AddToMemory extends Tool
             'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory')->required(),
             'project_name' => $schema->string()->description('The project name to associate with the memory')->required(),
             'document_type' => $schema->string()->description('The document type of the memory')->required(),
-            'generate_embedding' => $schema->boolean()->description('Whether to generate an embedding for this memory'),
         ];
     }
 }
