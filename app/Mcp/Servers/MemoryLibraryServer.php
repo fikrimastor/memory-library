@@ -9,12 +9,12 @@ class MemoryLibraryServer extends Server
     /**
      * The MCP server's name.
      */
-    protected string $name = 'Memory Library Server';
+    protected string $name = 'Memory Library';
 
     /**
      * The MCP server's version.
      */
-    protected string $version = '1.1.0';
+    protected string $version = '1.2.1';
 
     /**
      * The MCP server's instructions for the LLM.
@@ -48,6 +48,6 @@ class MemoryLibraryServer extends Server
      * @var array<int, class-string<\Laravel\Mcp\Server\Prompt>>
      */
     protected array $prompts = [
-        //
+        \App\Mcp\Prompts\SummarizeRecentActivity::class
     ];
 }

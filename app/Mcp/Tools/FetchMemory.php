@@ -37,7 +37,7 @@ class FetchMemory extends Tool
         ]);
 
         if (! $user instanceof \App\Models\User) {
-            return Response::error('Authentication required to search memory.');
+            return Response::error('Authentication required to fetch memory.');
         }
 
         // Get user ID from params or Auth
