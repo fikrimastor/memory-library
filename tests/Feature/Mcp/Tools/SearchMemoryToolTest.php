@@ -52,7 +52,7 @@ test('it returns error when query is missing', function () {
         'use_embedding' => false,
     ]);
 
-    $response->assertOk()->assertSee('"message": "query is required"');
+    $response->assertHasErrors(['query is required']);
 });
 
 test('it can s search with different parameters', function () {

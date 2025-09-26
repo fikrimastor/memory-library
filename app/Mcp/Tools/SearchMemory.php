@@ -43,27 +43,27 @@ class SearchMemory extends Tool
             // Validate required parameters
             $query = $params['query'] ?? '';
             if (empty($query)) {
-                return Response::json([
+                return Response::error(json_encode([
                     'success' => false,
                     'error' => 'validation_error',
                     'message' => 'query is required',
-                ]);
+                ]));
             }
 
             if (! $userId) {
-                return Response::json([
+                return Response::error(json_encode([
                     'success' => false,
                     'error' => 'authentication_error',
                     'message' => 'user_id is required when not authenticated',
-                ]);
+                ]));
             }
 
             $limit = $params['limit'] ?? 10;
             $threshold = $params['threshold'] ?? 0.7;
-            $useEmbedding = $params['use_embedding'] ?? true;
-            $fallbackToDatabase = $params['fallback_to_database'] ?? true;
+            $useEmbedding = (bool) ($params['use_embedding'] ?? true);
+            $fallbackToDatabase = (bool) ($params['fallback_to_database'] ?? true);
 
-            $useHybridSearch = $params['use_hybrid_search'] ?? config('embedding.hybrid_search.enabled', false);
+            $useHybridSearch = (bool) ($params['use_hybrid_search'] ?? config('embedding.hybrid_search.enabled', false));
             $vectorWeight = $params['vector_weight'] ?? config('embedding.hybrid_search.vector_weight', 0.7);
             $textWeight = $params['text_weight'] ?? config('embedding.hybrid_search.text_weight', 0.3);
 
@@ -87,9 +87,9 @@ class SearchMemory extends Tool
                 'message' => 'Failed to search memory: '.$e->getMessage(),
             ];
 
-            Log::error("Try to add memory failed: {$e->getMessage()}", $metadata);
+            Log::error("Search memory failed: {$e->getMessage()}", $metadata);
 
-            return Response::text(json_encode($metadata));
+            return Response::error(json_encode($metadata));
         }
     }
 
@@ -104,6 +104,9 @@ class SearchMemory extends Tool
             'query' => $schema->string()->description('The search query')->required(),
             'limit' => $schema->integer()->description('Maximum number of results to return'),
             'threshold' => $schema->number()->description('Similarity threshold for vector search'),
+            'use_embedding' => $schema->boolean()->description('Whether to enable vector search (defaults to true)'),
+            'fallback_to_database' => $schema->boolean()->description('Fallback to SQL search when embeddings miss (defaults to true)'),
+            'use_hybrid_search' => $schema->boolean()->description('Enable hybrid search mode using embeddings and text search'),
             'vector_weight' => $schema->number()->description('Weight for vector search results in hybrid mode (0.0-1.0)'),
             'text_weight' => $schema->number()->description('Weight for text search results in hybrid mode (0.0-1.0)'),
         ];

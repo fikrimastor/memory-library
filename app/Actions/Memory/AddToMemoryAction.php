@@ -24,7 +24,6 @@ final class AddToMemoryAction
      * @param  array  $tags  Tags for the memory
      * @param  string|null  $projectName  The project name
      * @param  string  $documentType  The document type
-     * @param  bool  $generateEmbedding  Whether to generate an embedding
      * @throws \Throwable
      */
     public function handle(
@@ -33,8 +32,7 @@ final class AddToMemoryAction
         array $metadata = [],
         array $tags = [],
         ?string $projectName = null,
-        string $documentType = 'Memory',
-        bool $generateEmbedding = true
+        string $documentType = 'Memory'
     ): UserMemory {
         $user = User::findOrFail($userId);
 
