@@ -16,7 +16,7 @@ class SearchMemory extends Tool
     /**
      * The tool's name.
      */
-    protected string $name = 'search';
+    protected string $name = 'advance-search';
 
     /**
      * The tool's description.
