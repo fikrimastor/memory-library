@@ -94,8 +94,6 @@ const refreshSharingInfo = async (): Promise<void> => {
 
     const data = await response.json();
 
-    console.log('refreshsharing', data, memoryState.value);
-
     memoryState.value = {
         ...memoryState.value,
         visibility: data.visibility,
@@ -156,10 +154,6 @@ const updateVisibility = async (
                         description: message,
                     });
                 } catch (error) {
-                    console.error(
-                        'Visibility updated but refreshing info failed:',
-                        error,
-                    );
                     memoryState.value = previousState;
                     statusVariant.value = 'error';
                     statusMessage.value =
@@ -167,10 +161,6 @@ const updateVisibility = async (
                 }
             },
             onError: (errors) => {
-                console.error(
-                    'Visibility update error:',
-                    errors.name || errors.error,
-                );
                 memoryState.value = previousState;
                 statusVariant.value = 'error';
                 statusMessage.value =
@@ -310,7 +300,7 @@ const copyShareUrl = async () => {
 
                 <!-- Share Link (if shared) -->
                 <div
-                    v-if="memoryState.visibility !== 'private' && shareUrl"
+                    v-if="shareUrl"
                     class="space-y-2"
                 >
                     <div class="text-sm font-medium">Share Link</div>

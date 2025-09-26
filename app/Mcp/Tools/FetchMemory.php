@@ -29,8 +29,19 @@ class FetchMemory extends Tool
     public function handle(Request $request, GetSpecifiedMemoryAction $action): Response
     {
         $user = $request->user();
-        $params = $request->all();
-        $recentMemory = $action->handle($user, $params['id']);
+        $validated = $request->validate([
+            'id' => 'required|string|exists:user_memories,share_token',
+        ], [
+            'id.required' => 'Memory ID is required',
+            'id.exists' => 'Memory with the given ID does not exist',
+        ]);
+
+        if (! $user instanceof \App\Models\User) {
+            return Response::error('Authentication required to search memory.');
+        }
+
+        // Get user ID from params or Auth
+        $recentMemory = $action->handle($user, $validated['id']);
 
         if (! $recentMemory) {
             return Response::error(json_encode([
@@ -42,7 +53,7 @@ class FetchMemory extends Tool
 
         $documentType = str($recentMemory['document_type'])->headline()->value();
         $data = [
-            'id' => $params['id'],
+            'id' => $validated['id'],
             'title' => $recentMemory['title'] ?? "({$documentType}-{$recentMemory['project_name']}-{$recentMemory['created_at']})",
             'text' => $recentMemory['memory'],
             'url' => $recentMemory['is_public'] ? $recentMemory['url'] : '',
