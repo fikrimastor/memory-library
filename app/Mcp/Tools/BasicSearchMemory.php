@@ -31,10 +31,20 @@ class BasicSearchMemory extends Tool
     public function handle(Request $request, SearchMemoryAction $action): Response
     {
         try {
-            $query = $request->get('query', '');
+            $user = $request->user();
+            $validated = $request->validate([
+                'query' => 'required|string|max:2000',
+            ], [
+                'query' => 'Query must be less than 2000 characters',
+            ]);
+
+            if (! $user instanceof \App\Models\User) {
+                return Response::error('Authentication required to search memory.');
+            }
 
             // Get user ID from params or Auth
-            $userId = Auth::id();
+            $userId = $user->id;
+            $query = $validated['query'] ?? '';
 
             // Validate required parameters
             if (empty($query)) {

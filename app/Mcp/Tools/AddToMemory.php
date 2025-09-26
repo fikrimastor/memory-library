@@ -33,36 +33,36 @@ class AddToMemory extends Tool
     public function handle(Request $request, AddToMemoryAction $action): Response
     {
         try {
-            $params = $request->all();
+            $user = $request->user();
+            $validated = $request->validate([
+                'thing_to_remember' => 'required|string|max:10000',
+                'metadata' => 'nullable|array',
+                'tags' => 'nullable|array',
+                'tags.*' => 'string|max:50',
+                'project_name' => 'nullable|string|max:255',
+                'document_type' => 'nullable|string|max:100',
+            ], [
+                'thing_to_remember.required' => 'Content to remember is required',
+                'thing_to_remember.max' => 'Content must be less than 10,000 characters',
+                'tags.*.max' => 'Each tag must be less than 50 characters',
+                'project_name.max' => 'Project name must be less than 255 characters',
+                'document_type.max' => 'Document type must be less than 100 characters',
+            ]);
 
-            // Get user ID from params or Auth
-            $userId = Auth::id();
-
-            // Validate required parameters
-            $content = $params['thing_to_remember'] ?? '';
-            if (empty($content)) {
-                return Response::error(json_encode([
-                    'success' => false,
-                    'error' => 'validation_error',
-                    'message' => 'thing_to_remember is required',
-                ]));
+            if (! $user instanceof \App\Models\User) {
+                return Response::error('Authentication required to search memory.');
             }
 
-            if (! $userId) {
-                return Response::error(json_encode([
-                    'success' => false,
-                    'error' => 'authentication_error',
-                    'message' => 'user_id is required when not authenticated',
-                ]));
-            }
+            // Get user ID
+            $userId = $user->id;
 
             $memory = $action->handle(
                 userId: $userId,
-                content: $content,
-                metadata: $params['metadata'] ?? [],
-                tags: $params['tags'] ?? [],
-                projectName: $params['project_name'] ?? null,
-                documentType: $params['document_type'] ?? 'Memory',
+                content: $validated['thing_to_remember'],
+                metadata: $validated['metadata'] ?? [],
+                tags: $validated['tags'] ?? [],
+                projectName: $validated['project_name'] ?? null,
+                documentType: $validated['document_type'] ?? 'Memory',
             );
 
             $metadata = [

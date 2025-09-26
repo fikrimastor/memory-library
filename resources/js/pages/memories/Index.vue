@@ -50,6 +50,7 @@ interface Memory {
     visibility: 'private' | 'public' | 'unlisted';
     share_token?: string;
     shared_at?: string;
+    share_url?: string;
 }
 
 interface PaginatedMemories {
