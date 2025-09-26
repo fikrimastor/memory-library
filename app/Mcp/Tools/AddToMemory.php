@@ -99,7 +99,6 @@ class AddToMemory extends Tool
             'tags' => $schema->array()->items($schema->string())->description('Tags to associate with the memory'),
             'project_name' => $schema->string()->description('The project name to associate with the memory'),
             'document_type' => $schema->string()->description('The document type of the memory'),
-            'generate_embedding' => $schema->boolean()->description('Whether to queue an embedding generation job (defaults to true)'),
         ];
     }
 }
