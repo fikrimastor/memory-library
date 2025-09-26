@@ -49,7 +49,7 @@ class AddToMemory extends Tool
             ]);
 
             if (! $user instanceof \App\Models\User) {
-                return Response::error('Authentication required to search memory.');
+                return Response::error('Authentication required to add memory.');
             }
 
             // Get user ID
