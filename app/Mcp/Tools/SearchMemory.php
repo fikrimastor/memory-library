@@ -14,11 +14,6 @@ use Throwable;
 class SearchMemory extends Tool
 {
     /**
-     * The tool's name.
-     */
-    protected string $name = 'advance-search';
-
-    /**
      * The tool's description.
      */
     protected string $description = 'This tool searches the user\'s persistent memory layer for relevant information, preferences, and past context.
