@@ -41,7 +41,7 @@ final class AddToMemoryAction
             ->memories()
             ->create([
             'thing_to_remember' => $content,
-            'title' => $metadata['title'] ?? null,
+            'title' => $metadata['title'] ?? "Memories on {$projectName} - {$documentType}",
             'document_type' => $documentType,
             'project_name' => $projectName,
             'tags' => $tags,
