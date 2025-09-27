@@ -1,11 +1,24 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/vue-starter-kit",
+    "name": "fikrimastor/memory-library",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "MCP Server to store your context like your personal journal build using Laravel framework.",
     "keywords": [
         "laravel",
-        "framework"
+        "embedding",
+        "model",
+        "context",
+        "journal",
+        "memory",
+        "mcp"
+    ],
+    "authors": [
+        {
+            "name": "Fikri Mastor",
+            "email": "hello@fikrimastor.com",
+            "homepage": "https://fikrimastor.com",
+            "role": "Developer"
+        }
     ],
     "license": "MIT",
     "require": {
@@ -14,8 +27,12 @@
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/mcp": "^0.2.0",
+        "laravel/passport": "^13.0",
+        "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9"
+        "laravel/wayfinder": "^0.1.9",
+        "opcodesio/log-viewer": "^3.19",
+        "predis/predis": "^3.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

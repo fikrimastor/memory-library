@@ -14,16 +14,103 @@ defineProps<Props>();
 
 <template>
     <svg
+        viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 40 42"
         :class="className"
         v-bind="$attrs"
     >
-        <path
-            fill="currentColor"
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633ZM38 18.301l-5.6 3.11v-6.157l5.6-3.11V18.3Zm-1.06-7.856-5.54 3.078-5.54-3.079 5.54-3.078 5.54 3.079ZM24.8 18.3v-6.157l5.6 3.111v6.158L24.8 18.3Zm-1 1.732 5.54 3.078-13.14 7.302-5.54-3.078 13.14-7.3v-.002Zm-16.2 7.89 7.6 4.222V38.3L2 30.966V7.92l5.6 3.111v16.892ZM8.6 9.3 3.06 6.222 8.6 3.143l5.54 3.08L8.6 9.3Zm21.8 15.51-13.2 7.334V38.3l13.2-7.334v-6.156ZM9.6 11.034l5.6-3.11v14.6l-5.6 3.11v-14.6Z"
+        <!-- Main circle background -->
+        <circle cx="50" cy="50" r="40" fill="#dc2626" />
+
+        <!-- Memory/storage symbol - abstract stack -->
+        <rect
+            x="35"
+            y="30"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.9"
+        />
+        <rect
+            x="35"
+            y="38"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.7"
+        />
+        <rect
+            x="35"
+            y="46"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.9"
+        />
+        <rect
+            x="35"
+            y="54"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.7"
+        />
+        <rect
+            x="35"
+            y="62"
+            width="30"
+            height="4"
+            rx="2"
+            fill="white"
+            opacity="0.9"
+        />
+
+        <!-- Simple connection dots -->
+        <circle cx="25" cy="40" r="2" fill="white" opacity="0.6" />
+        <circle cx="75" cy="40" r="2" fill="white" opacity="0.6" />
+        <circle cx="25" cy="60" r="2" fill="white" opacity="0.6" />
+        <circle cx="75" cy="60" r="2" fill="white" opacity="0.6" />
+
+        <!-- Subtle connecting lines -->
+        <line
+            x1="27"
+            y1="40"
+            x2="35"
+            y2="38"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
+        />
+        <line
+            x1="27"
+            y1="60"
+            x2="35"
+            y2="62"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
+        />
+        <line
+            x1="73"
+            y1="40"
+            x2="65"
+            y2="38"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
+        />
+        <line
+            x1="73"
+            y1="60"
+            x2="65"
+            y2="62"
+            stroke="white"
+            stroke-width="1"
+            opacity="0.3"
         />
     </svg>
 </template>

@@ -4,6 +4,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/vendor
 /storage/*.key
 /storage/pail
 /resources/js/actions
@@ -26,3 +27,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+.claude/settings.local.json
+.junie
+.serena

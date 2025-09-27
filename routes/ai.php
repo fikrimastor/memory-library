@@ -1,5 +1,11 @@
 <?php
 
+use App\Mcp\Servers\MemoryLibraryServer;
 use Laravel\Mcp\Facades\Mcp;
 
-// Mcp::web('/mcp/demo', \App\Mcp\Servers\PublicServer::class);
+Mcp::oauthRoutes();
+
+// Also register it as a web server for HTTP access
+Mcp::web('/mcp', MemoryLibraryServer::class)
+    ->name('mcp.memory-library')
+    ->middleware('auth:api');
