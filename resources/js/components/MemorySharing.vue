@@ -12,8 +12,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/composables/use-toast';
 import { router } from '@inertiajs/vue3';
-import { Copy, Loader2 } from 'lucide-vue-next';
+import { Loader2 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import { useClipboard } from '@vueuse/core';
 
 interface Memory {
     id: number;
@@ -49,14 +50,13 @@ const pendingVisibility = ref<Memory['visibility'] | null>(null);
 const statusMessage = ref<string | null>(null);
 const statusVariant = ref<'success' | 'error'>('success');
 
-const shareUrl = computed(() => {
+// Clipboard functionality
+const { copy, copied, isSupported } = useClipboard();
+
+const isShareable = computed(() => {
     const current = memoryState.value;
 
-    if (current.visibility === 'private' || !current.share_token) {
-        return null;
-    }
-
-    return current.share_url;
+    return current.visibility === 'public' && current.share_token;
 });
 
 watch(
@@ -98,6 +98,7 @@ const refreshSharingInfo = async (): Promise<void> => {
         ...memoryState.value,
         visibility: data.visibility,
         share_token: data.share_token ?? undefined,
+        share_url: data.share_url ?? undefined,
         shared_at:
             data.visibility === 'private'
                 ? null
@@ -179,24 +180,6 @@ const updateVisibility = async (
             },
         },
     );
-};
-
-const copyShareUrl = async () => {
-    if (!shareUrl.value) return;
-
-    try {
-        await navigator.clipboard.writeText(shareUrl.value);
-        toast({
-            title: 'Link copied!',
-            description: 'Share URL has been copied to clipboard.',
-        });
-    } catch (err) {
-        toast({
-            title: 'Error',
-            description: 'Failed to copy link to clipboard.',
-            variant: 'destructive',
-        });
-    }
 };
 </script>
 <template>
@@ -300,22 +283,22 @@ const copyShareUrl = async () => {
 
                 <!-- Share Link (if shared) -->
                 <div
-                    v-if="shareUrl"
+                    v-if="isShareable"
                     class="space-y-2"
                 >
                     <div class="text-sm font-medium">Share Link</div>
                     <div class="flex gap-2">
                         <Input
-                            v-model="shareUrl"
+                            :model-value="memoryState.share_url || ''"
                             readonly
                             class="flex-1 text-current dark:text-white"
                         />
                         <Button
-                            @click="copyShareUrl"
-                            variant="outline"
-                            size="sm"
+                            variant="outline" v-bind:disabled="! isSupported"
+                            @click="copy(memoryState.share_url || '')"
+                            class="w-full sm:w-auto"
                         >
-                            <Copy class="h-4 w-4" />
+                            {{ copied ? 'Copied!' : 'Copy' }}
                         </Button>
                     </div>
                 </div>

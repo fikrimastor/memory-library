@@ -137,6 +137,7 @@ class MemoryController extends Controller
                     'message' => 'Memory is now public.',
                     'visibility' => $memory->visibility,
                     'share_token' => $memory->share_token,
+                    'share_url' => $memory->share_url,
                     'public_url' => $memory->getPublicUrl(),
                     'is_shared' => $memory->is_public,
                 ]);
@@ -190,6 +191,7 @@ class MemoryController extends Controller
         return response()->json([
             'visibility' => $memory->visibility,
             'share_token' => $memory->share_token,
+            'share_url' => $memory->share_url,
             'public_url' => $memory->getPublicUrl(),
             'is_shared' => $memory->is_public,
         ]);
