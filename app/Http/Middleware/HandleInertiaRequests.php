@@ -47,7 +47,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
-                'token' => fn () => $request->session()->get('created_token')
+                'token' => fn () => $request->session()->pull('created_token')
             ],
         ];
     }
