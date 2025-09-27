@@ -53,14 +53,10 @@ const statusVariant = ref<'success' | 'error'>('success');
 // Clipboard functionality
 const { copy, copied, isSupported } = useClipboard();
 
-const shareUrl = computed(() => {
+const isShareable = computed(() => {
     const current = memoryState.value;
 
-    if (current.visibility === 'private' || !current.share_token) {
-        return null;
-    }
-
-    return current.share_url;
+    return current.visibility === 'public' && current.share_token;
 });
 
 watch(
@@ -102,6 +98,7 @@ const refreshSharingInfo = async (): Promise<void> => {
         ...memoryState.value,
         visibility: data.visibility,
         share_token: data.share_token ?? undefined,
+        share_url: data.share_url ?? undefined,
         shared_at:
             data.visibility === 'private'
                 ? null
@@ -286,19 +283,19 @@ const updateVisibility = async (
 
                 <!-- Share Link (if shared) -->
                 <div
-                    v-if="shareUrl"
+                    v-if="isShareable"
                     class="space-y-2"
                 >
                     <div class="text-sm font-medium">Share Link</div>
                     <div class="flex gap-2">
                         <Input
-                            v-model="shareUrl"
+                            :model-value="memoryState.share_url || ''"
                             readonly
                             class="flex-1 text-current dark:text-white"
                         />
                         <Button
                             variant="outline" v-bind:disabled="! isSupported"
-                            @click="copy(memory.share_url || '')"
+                            @click="copy(memoryState.share_url || '')"
                             class="w-full sm:w-auto"
                         >
                             {{ copied ? 'Copied!' : 'Copy' }}

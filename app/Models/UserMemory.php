@@ -104,6 +104,9 @@ class UserMemory extends Model
         return Str::markdown($content, [
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
+            'renderer' => [
+                'soft_break' => "<br />",
+            ],
             'unordered_list_markers' => ['•', '▪', '▫'],
         ]);
     }
