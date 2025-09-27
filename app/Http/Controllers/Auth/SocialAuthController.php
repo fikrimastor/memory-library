@@ -142,6 +142,8 @@ class SocialAuthController extends Controller
 
             Auth::login($user);
 
+            session()->regenerate();
+
             return redirect()->intended(route('dashboard', absolute: false));
         } catch (Exception $e) {
             Log::error('GitHub OAuth user creation/login error: '.$e->getMessage());
