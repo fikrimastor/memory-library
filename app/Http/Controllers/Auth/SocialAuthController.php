@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
@@ -117,10 +118,11 @@ class SocialAuthController extends Controller
             }
 
             // Create a new user
+            $name = $githubUser->getName() ?? $githubUser->getNickname();
             $user = User::create([
-                'name' => $githubUser->getName() ?? $githubUser->getNickname(),
+                'name' => $name,
                 'email' => $githubUser->getEmail(),
-                'password' => '', // No password needed for social login
+                'password' => bcrypt($name.Str::ulid()), // random password
             ]);
 
             // Create the social account link

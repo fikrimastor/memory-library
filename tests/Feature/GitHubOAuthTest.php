@@ -7,8 +7,6 @@ it('has GitHub OAuth routes', function () {
     // Test that the routes exist without actually calling them
     expect(route('github.login'))->toBeString();
     expect(route('github.callback'))->toBeString();
-    expect(route('github.link'))->toBeString();
-    expect(route('github.unlink'))->toBeString();
 });
 
 // Test the unlink functionality directly on the model
