@@ -22,20 +22,24 @@ class MemoryController extends Controller
         $query = $request->input('search');
         $project = $request->input('project');
 
-        $memories = $user->memories()
+        $queryMemories = $user->memories();
+
+        $memories = $queryMemories
             ->when($query, function ($q, $query) {
-                $q->where('title', 'like', "%{$query}%")
-                    ->orWhere('thing_to_remember', 'like', "%{$query}%")
-                    ->orWhere('project_name', 'like', "%{$query}%");
+                $q->where(function ($subQuery) use ($query) {
+                    $subQuery->where('title', 'like', "%{$query}%")
+                        ->orWhere('thing_to_remember', 'like', "%{$query}%")
+                        ->orWhere('project_name', 'like', "%{$query}%");
+                });
             })
             ->when($project, function ($q, $project) {
                 $q->where('project_name', $project);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            ->paginate(12)
             ->withQueryString();
 
-        $projects = UserMemory::where('user_id', $user->id)
+        $projects = $queryMemories
             ->select('project_name')
             ->distinct()
             ->pluck('project_name');
@@ -144,7 +148,7 @@ class MemoryController extends Controller
             }
         } catch (\Throwable $exception) {
             return response()->json([
-                'error' => 'Failed to create memory: '.$exception->getMessage()
+                'error' => 'Failed to create memory: '.$exception->getMessage(),
             ]);
 
         }
@@ -174,7 +178,7 @@ class MemoryController extends Controller
             }
         } catch (\Throwable $exception) {
             return response()->json([
-                'error' => 'Failed to create memory: '.$exception->getMessage()
+                'error' => 'Failed to create memory: '.$exception->getMessage(),
             ]);
         }
 
