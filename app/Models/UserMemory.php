@@ -95,7 +95,17 @@ class UserMemory extends Model
 
     public function getSanitizedContent(): string
     {
-        return strip_tags($this->thing_to_remember);
+        $content = $this->thing_to_remember ?? '';
+
+        if (blank($content)) {
+            return '';
+        }
+
+        return Str::markdown($content, [
+            'html_input' => 'strip',
+            'allow_unsafe_links' => false,
+            'unordered_list_markers' => ['•', '▪', '▫'],
+        ]);
     }
 
     // Helper methods
