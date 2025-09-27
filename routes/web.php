@@ -16,7 +16,9 @@ Route::resource('memories', App\Http\Controllers\MemoryController::class)
 
 // Public sharing routes (no authentication required)
 Route::prefix('share')->name('memories.public.')->group(function () {
-    Route::get('/{memory:share_token}', [App\Http\Controllers\PublicMemoryController::class, 'show'])->name('show');
+    Route::get('/{memory:share_token}', [App\Http\Controllers\PublicMemoryController::class, 'show'])
+        ->middleware(['throttle:public-memory'])
+        ->name('show');
 });
 
 // Authenticated sharing routes

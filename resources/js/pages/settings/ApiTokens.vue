@@ -307,12 +307,7 @@ const closeTokenDialog = () => {
                             >
                                 {{ copied ? 'Copied!' : 'Copy Token' }}
                             </Button>
-                            <div
-                                v-if="!isSupported"
-                                class="text-xs text-muted-foreground"
-                            >
-                                Clipboard not supported
-                            </div>
+
                             <Button
                                 @click="closeTokenDialog"
                                 class="w-full sm:w-auto"

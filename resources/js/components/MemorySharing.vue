@@ -12,8 +12,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/composables/use-toast';
 import { router } from '@inertiajs/vue3';
-import { Copy, Loader2 } from 'lucide-vue-next';
+import { Loader2 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import { useClipboard } from '@vueuse/core';
 
 interface Memory {
     id: number;
@@ -48,6 +49,9 @@ const isUpdating = ref(false);
 const pendingVisibility = ref<Memory['visibility'] | null>(null);
 const statusMessage = ref<string | null>(null);
 const statusVariant = ref<'success' | 'error'>('success');
+
+// Clipboard functionality
+const { copy, copied, isSupported } = useClipboard();
 
 const shareUrl = computed(() => {
     const current = memoryState.value;
@@ -180,24 +184,6 @@ const updateVisibility = async (
         },
     );
 };
-
-const copyShareUrl = async () => {
-    if (!shareUrl.value) return;
-
-    try {
-        await navigator.clipboard.writeText(shareUrl.value);
-        toast({
-            title: 'Link copied!',
-            description: 'Share URL has been copied to clipboard.',
-        });
-    } catch (err) {
-        toast({
-            title: 'Error',
-            description: 'Failed to copy link to clipboard.',
-            variant: 'destructive',
-        });
-    }
-};
 </script>
 <template>
     <Dialog v-model:open="isOpen">
@@ -311,11 +297,11 @@ const copyShareUrl = async () => {
                             class="flex-1 text-current dark:text-white"
                         />
                         <Button
-                            @click="copyShareUrl"
-                            variant="outline"
-                            size="sm"
+                            variant="outline" v-bind:disabled="! isSupported"
+                            @click="copy(memory.share_url || '')"
+                            class="w-full sm:w-auto"
                         >
-                            <Copy class="h-4 w-4" />
+                            {{ copied ? 'Copied!' : 'Copy' }}
                         </Button>
                     </div>
                 </div>

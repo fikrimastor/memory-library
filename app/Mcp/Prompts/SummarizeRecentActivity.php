@@ -10,7 +10,9 @@ use Laravel\Mcp\Server\Prompts\Argument;
 class SummarizeRecentActivity extends Prompt
 {
     protected string $name = 'summarize-recent-activity';
+
     protected string $title = 'summarize-recent-activity';
+
     /**
      * The prompt's description.
      */
