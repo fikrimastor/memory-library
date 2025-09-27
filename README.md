@@ -23,6 +23,7 @@ To learn the most from Memory Library and Laravel MCP, take a look at these dire
 ## API
 
 Memory Library provides a REST API for programmatic access. API endpoints are available under `/api/` with OAuth2 authentication.
+Will be documented further in the future, currently in progress.
 
 ### Getting an API Token
 
@@ -168,3 +169,30 @@ Many AI agents use Node which comes with its own certificate store, meaning they
 - **Impact:** Fragmented development experience
 - **Example:** Some discussions work happen in Claude Desktop, continue finalising the requirements in Claude mobile, and execute the task in claude code CLI. This would lead to loss of context and inconsistent results.
 - **Business Cost:** Increased cognitive load and context switching overhead
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any
+contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also
+simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Change Log
+
+Please see the [CHANGELOG](./CHANGELOG.md) for more information on what has changed recently.
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability, please send an e-mail to Fikri Mastor via [hello@fikrimastor.com](mailto:hello@fikrimastor.com). All security vulnerabilities will be promptly addressed.
+
+## License
+
+The Memory Library is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
