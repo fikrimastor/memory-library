@@ -41,7 +41,7 @@ const currentPath = typeof window !== undefined ? window.location.pathname : '';
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
-                <nav class="flex flex-col space-y-1 space-x-0">
+                <nav class="flex flex-col space-x-0 space-y-1">
                     <Button
                         v-for="item in sidebarNavItems"
                         :key="toUrl(item.href)"

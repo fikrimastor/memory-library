@@ -51,7 +51,7 @@ onMounted(async () => {
         </CardHeader>
         <CardContent>
             <div
-                class="flex flex-col gap-3 select-none sm:flex-row sm:items-center sm:justify-between"
+                class="flex select-none flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
             >
                 <Button @click="toggleRecoveryCodesVisibility" class="w-fit">
                     <component
@@ -93,13 +93,13 @@ onMounted(async () => {
                 <div v-else class="mt-3 space-y-3">
                     <div
                         ref="recoveryCodeSectionRef"
-                        class="grid gap-1 rounded-lg bg-muted p-4 font-mono text-sm"
+                        class="bg-muted grid gap-1 rounded-lg p-4 font-mono text-sm"
                     >
                         <div v-if="!recoveryCodesList.length" class="space-y-2">
                             <div
                                 v-for="n in 8"
                                 :key="n"
-                                class="h-4 animate-pulse rounded bg-muted-foreground/20"
+                                class="bg-muted-foreground/20 h-4 animate-pulse rounded"
                             ></div>
                         </div>
                         <div
@@ -110,7 +110,7 @@ onMounted(async () => {
                             {{ code }}
                         </div>
                     </div>
-                    <p class="text-xs text-muted-foreground select-none">
+                    <p class="text-muted-foreground select-none text-xs">
                         Each recovery code can be used once to access your
                         account and will be removed after use. If you need more,
                         click

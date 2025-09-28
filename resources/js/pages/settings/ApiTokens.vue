@@ -236,7 +236,7 @@ const closeTokenDialog = () => {
                         <div
                             v-for="token in tokens"
                             :key="token.id"
-                            class="flex items-center justify-between rounded-lg border bg-card p-4"
+                            class="bg-card flex items-center justify-between rounded-lg border p-4"
                         >
                             <div class="space-y-1">
                                 <div class="flex items-center gap-3">
@@ -244,7 +244,7 @@ const closeTokenDialog = () => {
                                         {{ token.name }}
                                     </h4>
                                 </div>
-                                <p class="text-xs text-muted-foreground">
+                                <p class="text-muted-foreground text-xs">
                                     Created {{ formatDate(token.created_at) }}
                                 </p>
                             </div>
@@ -278,16 +278,16 @@ const closeTokenDialog = () => {
                         <div class="min-h-0 flex-1 space-y-4 overflow-y-auto">
                             <div
                                 v-if="($page.props.flash as any)?.token"
-                                class="rounded-lg border bg-muted p-4"
+                                class="bg-muted rounded-lg border p-4"
                             >
                                 <code
-                                    class="block font-mono text-xs leading-relaxed break-all sm:text-sm"
+                                    class="block break-all font-mono text-xs leading-relaxed sm:text-sm"
                                     >{{
                                         ($page.props.flash as any)?.token
                                     }}</code
                                 >
                             </div>
-                            <p class="text-sm text-muted-foreground">
+                            <p class="text-muted-foreground text-sm">
                                 Make sure to copy your API token now. You won't
                                 be able to see it again!
                             </p>
@@ -333,9 +333,9 @@ const closeTokenDialog = () => {
 
                         <div
                             v-if="revokeError"
-                            class="rounded-md border border-destructive/20 bg-destructive/10 p-3"
+                            class="border-destructive/20 bg-destructive/10 rounded-md border p-3"
                         >
-                            <p class="text-sm text-destructive">
+                            <p class="text-destructive text-sm">
                                 {{ revokeError }}
                             </p>
                         </div>

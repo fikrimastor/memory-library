@@ -12,9 +12,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/composables/use-toast';
 import { router } from '@inertiajs/vue3';
+import { useClipboard } from '@vueuse/core';
 import { Loader2 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
-import { useClipboard } from '@vueuse/core';
 
 interface Memory {
     id: number;
@@ -106,9 +106,7 @@ const refreshSharingInfo = async (): Promise<void> => {
     };
 };
 
-const updateVisibility = async (
-    visibility: 'private' | 'public',
-) => {
+const updateVisibility = async (visibility: 'private' | 'public') => {
     if (memoryState.value.visibility === visibility || isUpdating.value) return;
 
     const previousState = { ...memoryState.value };
@@ -282,10 +280,7 @@ const updateVisibility = async (
                 </div>
 
                 <!-- Share Link (if shared) -->
-                <div
-                    v-if="isShareable"
-                    class="space-y-2"
-                >
+                <div v-if="isShareable" class="space-y-2">
                     <div class="text-sm font-medium">Share Link</div>
                     <div class="flex gap-2">
                         <Input
@@ -294,7 +289,8 @@ const updateVisibility = async (
                             class="flex-1 text-current dark:text-white"
                         />
                         <Button
-                            variant="outline" v-bind:disabled="! isSupported"
+                            variant="outline"
+                            v-bind:disabled="!isSupported"
                             @click="copy(memoryState.share_url || '')"
                             class="w-full sm:w-auto"
                         >
