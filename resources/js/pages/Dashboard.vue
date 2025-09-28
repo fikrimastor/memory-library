@@ -189,7 +189,7 @@ const configs = computed(() => ({
     copilot: {
         title: 'GitHub Copilot Configuration',
         content: `{
-  "mcpServers": {
+  "servers": {
     "memory-library": {
       "type": "http",
       "url": "${mcpUrl.value}",

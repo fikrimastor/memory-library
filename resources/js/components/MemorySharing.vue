@@ -193,18 +193,6 @@ const updateVisibility = async (
             </DialogHeader>
 
             <div class="space-y-4">
-                <div
-                    v-if="statusMessage"
-                    :class="[
-                        'rounded-md border p-3 text-sm',
-                        statusVariant === 'error'
-                            ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/40 dark:bg-red-950/50 dark:text-red-200'
-                            : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/50 dark:text-emerald-200',
-                    ]"
-                >
-                    {{ statusMessage }}
-                </div>
-
                 <!-- Current Status -->
                 <div class="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
                     <div class="flex items-center justify-between">
@@ -219,9 +207,7 @@ const updateVisibility = async (
                                 {{
                                     memoryState.visibility === 'private'
                                         ? '🔒'
-                                        : memoryState.visibility === 'public'
-                                          ? '🌍'
-                                          : '🔗'
+                                        : '🌍'
                                 }}
                                 {{ memoryState.visibility }}
                             </Badge>
@@ -296,7 +282,7 @@ const updateVisibility = async (
                         <Button
                             variant="outline" v-bind:disabled="! isSupported"
                             @click="copy(memoryState.share_url || '')"
-                            class="w-full sm:w-auto"
+                            class="shrink-0"
                         >
                             {{ copied ? 'Copied!' : 'Copy' }}
                         </Button>
