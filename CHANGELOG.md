@@ -2,6 +2,14 @@
 
 All notable changes to `memory-library` will be documented in this file.
 
+## v1.0.1 - 2025-09-28
+
+### What's Changed
+
+* fix: enhance memory handling and improve UI component structure #51 >>> main by @fikrimastor in https://github.com/fikrimastor/memory-library/pull/52
+
+**Full Changelog**: https://github.com/fikrimastor/memory-library/compare/v1.0.0...v1.0.1
+
 ## v1.0.0 - 2025-09-27
 
 ### What's Changed
