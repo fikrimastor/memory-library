@@ -39,7 +39,7 @@ const footerNavItems: NavItem[] = [
     },
     {
         title: 'Documentation',
-        href: 'https://github.com/fikrimastor/memory-library/README.md',
+        href: 'https://github.com/fikrimastor/memory-library/blob/main/README.md',
         icon: BookOpen,
     },
 ];

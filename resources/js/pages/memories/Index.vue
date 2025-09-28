@@ -112,7 +112,9 @@ const refresh = (): void => {
 };
 
 const deleteMemory = (memory: Memory): void => {
-    const title = memory.title || formatTitleFromParts(memory.document_type, memory.project_name);
+    const title =
+        memory.title ||
+        formatTitleFromParts(memory.document_type, memory.project_name);
     if (
         confirm(
             `Are you sure you want to delete "${title}"? This action cannot be undone.`,
@@ -139,13 +141,19 @@ const formatDate = (dateString: string): string => {
     });
 };
 
-const formatTitleFromParts = (documentType: string | null, projectName: string | null): string => {
+const formatTitleFromParts = (
+    documentType: string | null,
+    projectName: string | null,
+): string => {
     const parts = [documentType, projectName].filter(Boolean);
     return parts
         .join(' ')
         .replace(/[-_]/g, ' ')
         .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .map(
+            (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
         .join(' ');
 };
 
@@ -153,6 +161,14 @@ const formatTitleFromParts = (documentType: string | null, projectName: string |
 const openShareDialog = (memory: Memory): void => {
     selectedMemory.value = memory;
     shareDialogOpen.value = true;
+};
+
+// Memory Status
+const isSharableLabelClass = (memory: Memory): string => {
+    return memory.visibility === 'private' ? 'outline' : 'public';
+};
+const isSharableLabel = (memory: Memory): string => {
+    return memory.visibility === 'private' ? '🔒 Private' : '🌍 Public';
 };
 
 // Computed
@@ -212,7 +228,7 @@ const hasFilters = computed(() => props.search);
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div class="relative flex-1">
                     <Search
-                        class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                        class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
                     />
                     <Input
                         v-model="searchInput"
@@ -256,7 +272,7 @@ const hasFilters = computed(() => props.search);
                     :key="memory.id"
                     class="group transition-shadow hover:shadow-md"
                 >
-                    <CardHeader class="pb-3">
+                    <CardHeader class="pb-3 gap-2">
                         <div class="flex items-start justify-between gap-2">
                             <CardTitle class="text-lg leading-tight">
                                 {{ memory.title }}
@@ -267,7 +283,7 @@ const hasFilters = computed(() => props.search);
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        class="h-8 w-8 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                        class="h-8 w-8 p-0 opacity-100 transition-opacity"
                                     >
                                         <MoreVertical class="h-4 w-4" />
                                     </Button>
@@ -307,6 +323,15 @@ const hasFilters = computed(() => props.search);
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
+                        </div>
+
+                        <!-- Visibility Status -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <Badge
+                                :variant="isSharableLabelClass(memory) as any"
+                            >
+                                {{ isSharableLabel(memory) }}
+                            </Badge>
                         </div>
 
                         <!-- Meta Information -->

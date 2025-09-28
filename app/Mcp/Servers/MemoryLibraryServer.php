@@ -27,9 +27,9 @@ class MemoryLibraryServer extends Server
      * @var array<int, class-string<\Laravel\Mcp\Server\Tool>>
      */
     protected array $tools = [
-        \App\Mcp\Tools\BasicSearchMemory::class,
+        // \App\Mcp\Tools\BasicSearchMemory::class, // Having errors when connects to Qwen
         \App\Mcp\Tools\FetchMemory::class,
-        // \App\Mcp\Tools\SearchMemory::class, // Having errors when connects to Qwen
+        \App\Mcp\Tools\SearchMemory::class,
         \App\Mcp\Tools\AddToMemory::class,
     ];
 
