@@ -84,7 +84,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Methods
-const search = (): void => {
+const searchMemory = (): void => {
     router.get(
         memoriesIndex().url,
         {
@@ -99,7 +99,7 @@ const search = (): void => {
 
 const clearSearch = (): void => {
     searchInput.value = '';
-    search();
+    searchMemory();
 };
 
 const refresh = (): void => {
@@ -112,9 +112,10 @@ const refresh = (): void => {
 };
 
 const deleteMemory = (memory: Memory): void => {
+    const title = memory.title || formatTitleFromParts(memory.document_type, memory.project_name);
     if (
         confirm(
-            `Are you sure you want to delete "${memory.title}"? This action cannot be undone.`,
+            `Are you sure you want to delete "${title}"? This action cannot be undone.`,
         )
     ) {
         router.delete(memoriesDestroy(memory.id).url, {
@@ -138,24 +139,20 @@ const formatDate = (dateString: string): string => {
     });
 };
 
+const formatTitleFromParts = (documentType: string | null, projectName: string | null): string => {
+    const parts = [documentType, projectName].filter(Boolean);
+    return parts
+        .join(' ')
+        .replace(/[-_]/g, ' ')
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+};
+
 // Methods for sharing
 const openShareDialog = (memory: Memory): void => {
     selectedMemory.value = memory;
     shareDialogOpen.value = true;
-};
-
-const onMemoryUpdated = (updatedMemory: Memory): void => {
-    // Find and update the memory in the list
-    const index = props.memories.data.findIndex(
-        (m) => m.id === updatedMemory.id,
-    );
-    if (index !== -1) {
-        props.memories.data[index] = updatedMemory;
-    }
-
-    if (selectedMemory.value?.id === updatedMemory.id) {
-        selectedMemory.value = updatedMemory;
-    }
 };
 
 // Computed
@@ -215,18 +212,18 @@ const hasFilters = computed(() => props.search);
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div class="relative flex-1">
                     <Search
-                        class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+                        class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
                     />
                     <Input
                         v-model="searchInput"
                         placeholder="Search memories by title, content, type, or project..."
                         class="pl-10"
-                        @keydown.enter="search"
+                        @keydown.enter="searchMemory"
                     />
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <Button @click="search" size="sm"> Search </Button>
+                    <Button @click="searchMemory" size="sm"> Search </Button>
 
                     <Button
                         v-if="hasFilters"
@@ -445,7 +442,6 @@ const hasFilters = computed(() => props.search);
                 v-if="selectedMemory"
                 :memory="selectedMemory"
                 v-model:open="shareDialogOpen"
-                @updated="onMemoryUpdated"
             />
         </div>
     </AppLayout>

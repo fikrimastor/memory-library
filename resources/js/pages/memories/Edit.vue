@@ -187,7 +187,7 @@ const cancel = (): void => {
                                     v-for="tag in form.tags"
                                     :key="tag"
                                     variant="secondary"
-                                    class="flex items-center gap-1 py-1 pr-1 pl-3"
+                                    class="flex items-center gap-1 py-1 pl-3 pr-1"
                                 >
                                     {{ tag }}
                                     <Button

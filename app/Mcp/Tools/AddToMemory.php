@@ -22,8 +22,10 @@ class AddToMemory extends Tool
       4. User explicitly asks to remember events, journal, documents, or project details
       5. You generate significant documentation that would be valuable in future interactions
       6. Product Requirements Documents, Technical Specs, Best Practise documentation are created, IMPORTANT: remember the full content of these documents, don\'t just store a summary
+      7. User shares personal stories, experiences, or preferences that could enhance personalization
+      8. You create code snippets, configurations, an artifacts, or solutions that might be useful later
 
-      Consider using this tool after each user message to build comprehensive context over time. The stored information
+      IMPORTANT: Consider using this tool after each user message to build comprehensive context over time. The stored information
       will be available in future sessions to provide personalized responses.';
 
     /**

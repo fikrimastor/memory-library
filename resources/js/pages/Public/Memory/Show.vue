@@ -2,7 +2,6 @@
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useToast } from '@/composables/use-toast';
 import { Copy, Link } from 'lucide-vue-next';
 
@@ -34,19 +33,6 @@ const props = defineProps<{
 }>();
 
 const memory = computed(() => props.memory);
-const displayTitle = computed(() => {
-    const title = props.memory.title?.trim();
-    if (title) {
-        return title;
-    }
-
-    const metadataTitle = props.memory.metadata?.title?.trim();
-    if (metadataTitle) {
-        return metadataTitle;
-    }
-
-    return 'Untitled Memory';
-});
 
 const renderedContent = computed(() => props.memory.sanitized_content || '');
 const sharedAuthor = computed(
@@ -70,7 +56,7 @@ const copyShareUrl = async () => {
             title: 'Link copied!',
             description: 'Share URL has been copied to clipboard.',
         });
-    } catch (err) {
+    } catch {
         toast({
             title: 'Error',
             description: 'Failed to copy link to clipboard.',
@@ -88,7 +74,7 @@ const copyMemoryContent = async () => {
             title: 'Content copied!',
             description: 'Memory content has been copied to clipboard.',
         });
-    } catch (err) {
+    } catch {
         toast({
             title: 'Error',
             description: 'Failed to copy memory content.',
@@ -102,9 +88,9 @@ const copyMemoryContent = async () => {
     <div class="min-h-screen bg-white dark:bg-gray-900">
         <!-- Header with actions -->
         <div class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            <div class="mx-auto max-w-4xl px-8 py-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4">
+            <div class="mx-auto max-w-4xl px-4 sm:px-8 py-4">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex flex-wrap items-center gap-2">
                         <Badge v-if="memory.project_name" variant="secondary" class="text-xs">
                             📁 {{ memory.project_name }}
                         </Badge>
@@ -113,11 +99,11 @@ const copyMemoryContent = async () => {
                         </Badge>
                     </div>
                     <div class="flex gap-2">
-                        <Button @click="copyShareUrl" variant="outline" size="sm">
+                        <Button @click="copyShareUrl" variant="outline" size="sm" class="flex-1 sm:w-auto sm:flex-none">
                             <Link class="mr-2 h-4 w-4" />
                             Copy Link
                         </Button>
-                        <Button @click="copyMemoryContent" size="sm">
+                        <Button @click="copyMemoryContent" size="sm" class="flex-1 sm:w-auto sm:flex-none">
                             <Copy class="mr-2 h-4 w-4" />
                             Copy Content
                         </Button>
@@ -127,7 +113,7 @@ const copyMemoryContent = async () => {
         </div>
 
         <!-- Document Container -->
-        <div class="mx-auto max-w-4xl px-8 py-12">
+        <div class="mx-auto max-w-4xl px-4 sm:px-8 py-8 sm:py-12">
             <!-- Document Content -->
             <article class="document-content">
                 <div
@@ -179,6 +165,9 @@ const copyMemoryContent = async () => {
     font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     line-height: 1.7;
     color: #1f2937;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
 
 .dark .document-content {
@@ -231,6 +220,13 @@ const copyMemoryContent = async () => {
 .document-content :deep(ul) {
     margin: 1.25rem 0;
     padding-left: 1.5rem;
+    list-style-type: disc;
+}
+
+.document-content :deep(ol) {
+    margin: 1.25rem 0;
+    padding-left: 1.5rem;
+    list-style-type: decimal;
 }
 
 .document-content :deep(li) {
@@ -238,6 +234,7 @@ const copyMemoryContent = async () => {
     font-size: 1.125rem;
     line-height: 1.6;
     color: #374151;
+    display: list-item;
 }
 
 .document-content :deep(strong) {
@@ -264,6 +261,9 @@ const copyMemoryContent = async () => {
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 0.875rem;
     color: #dc2626;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .document-content :deep(pre) {
@@ -274,6 +274,9 @@ const copyMemoryContent = async () => {
     margin: 1.5rem 0;
     overflow-x: auto;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .document-content :deep(pre code) {
@@ -293,6 +296,11 @@ const copyMemoryContent = async () => {
 
 .dark .document-content :deep(p),
 .dark .document-content :deep(li) {
+    color: #d1d5db;
+}
+
+.dark .document-content :deep(ul),
+.dark .document-content :deep(ol) {
     color: #d1d5db;
 }
 
