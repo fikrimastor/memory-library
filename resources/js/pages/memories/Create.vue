@@ -115,7 +115,9 @@ const cancel = (): void => {
                 <form @submit.prevent="submit">
                     <CardContent class="space-y-6">
                         <!-- General Error -->
-                        <InputError :message="(form.errors as any).error_message" />
+                        <InputError
+                            :message="(form.errors as any).error_message"
+                        />
 
                         <!-- Title -->
                         <div class="space-y-2">
@@ -182,7 +184,7 @@ const cancel = (): void => {
                                     v-for="tag in form.tags"
                                     :key="tag"
                                     variant="secondary"
-                                    class="flex items-center gap-1 py-1 pr-1 pl-3"
+                                    class="flex items-center gap-1 py-1 pl-3 pr-1"
                                 >
                                     {{ tag }}
                                     <Button

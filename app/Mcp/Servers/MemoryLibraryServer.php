@@ -29,7 +29,7 @@ class MemoryLibraryServer extends Server
     protected array $tools = [
         \App\Mcp\Tools\BasicSearchMemory::class,
         \App\Mcp\Tools\FetchMemory::class,
-        \App\Mcp\Tools\SearchMemory::class,
+        // \App\Mcp\Tools\SearchMemory::class, // Having errors when connects to Qwen
         \App\Mcp\Tools\AddToMemory::class,
     ];
 
@@ -48,6 +48,6 @@ class MemoryLibraryServer extends Server
      * @var array<int, class-string<\Laravel\Mcp\Server\Prompt>>
      */
     protected array $prompts = [
-        \App\Mcp\Prompts\SummarizeRecentActivity::class
+        \App\Mcp\Prompts\SummarizeRecentActivity::class,
     ];
 }
