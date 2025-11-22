@@ -3,6 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Actions\Memory\AddToMemoryAction;
+use App\Mcp\Concerns\ChecksFeatureStatus;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
@@ -12,6 +13,8 @@ use Throwable;
 
 class AddToMemory extends Tool
 {
+    use ChecksFeatureStatus;
+
     /**
      * The tool's description.
      */

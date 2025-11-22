@@ -2,6 +2,7 @@
 
 namespace App\Mcp\Prompts;
 
+use App\Mcp\Concerns\ChecksFeatureStatus;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Prompt;
@@ -9,6 +10,8 @@ use Laravel\Mcp\Server\Prompts\Argument;
 
 class SummarizeRecentActivity extends Prompt
 {
+    use ChecksFeatureStatus;
+
     protected string $name = 'summarize-recent-activity';
 
     protected string $title = 'summarize-recent-activity';
@@ -167,7 +170,7 @@ PROMPT);
     public function arguments(): array
     {
         return [
-            new Argument('project_name', 'Specified project to summarize activity', true)
+            new Argument('project_name', 'Specified project to summarize activity', true),
         ];
     }
 }

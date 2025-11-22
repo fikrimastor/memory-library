@@ -3,12 +3,15 @@
 namespace App\Mcp\Resources;
 
 use App\Actions\Memory\GetRecentMemoryAction;
+use App\Mcp\Concerns\ChecksFeatureStatus;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Resource;
 
 class GetRecentMemory extends Resource
 {
+    use ChecksFeatureStatus;
+
     /**
      * The resource's description.
      */
@@ -25,7 +28,7 @@ class GetRecentMemory extends Resource
         $user = $request->user();
         $recentMemory = $action->handle($user);
 
-        if (!$recentMemory) {
+        if (! $recentMemory) {
             $text = "⚠️ **No Recent Memory Found.**\n\nYou haven't added any memories yet. Use the 'Add to Memory' tool to store important information.";
 
             return Response::text($text);
@@ -33,7 +36,7 @@ class GetRecentMemory extends Resource
 
         $output = "📖 **Your Recently Added Memory**\n\n";
 
-        if (!empty($recentMemory['title'])) {
+        if (! empty($recentMemory['title'])) {
             $output .= "**{$recentMemory['title']}**\n";
         }
 

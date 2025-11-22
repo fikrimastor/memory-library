@@ -3,6 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Actions\Memory\GetSpecifiedMemoryAction;
+use App\Mcp\Concerns\ChecksFeatureStatus;
 use Illuminate\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -10,6 +11,8 @@ use Laravel\Mcp\Server\Tool;
 
 class FetchMemory extends Tool
 {
+    use ChecksFeatureStatus;
+
     /**
      * The tool's name.
      */

@@ -65,4 +65,22 @@ class User extends Authenticatable implements OAuthenticatable
     {
         return $this->hasMany(SocialAccount::class);
     }
+
+    /**
+     * Get the MCP feature settings for the user.
+     */
+    public function mcpFeatureSettings(): HasMany
+    {
+        return $this->hasMany(UserMcpFeatureSetting::class);
+    }
+
+    /**
+     * Get all active MCP features for the user.
+     */
+    public function activeMcpFeatures(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(McpFeature::class, 'user_mcp_feature_settings')
+            ->wherePivot('is_active', true)
+            ->withTimestamps();
+    }
 }
