@@ -23,9 +23,14 @@ class GetRecentMemory extends Resource
     public function handle(Request $request, GetRecentMemoryAction $action): Response
     {
         $user = $request->user();
+
+        if (! $user instanceof \App\Models\User) {
+            return Response::error('Authentication required to access recent memory.');
+        }
+
         $recentMemory = $action->handle($user);
 
-        if (!$recentMemory) {
+        if (! $recentMemory) {
             $text = "⚠️ **No Recent Memory Found.**\n\nYou haven't added any memories yet. Use the 'Add to Memory' tool to store important information.";
 
             return Response::text($text);
@@ -33,7 +38,7 @@ class GetRecentMemory extends Resource
 
         $output = "📖 **Your Recently Added Memory**\n\n";
 
-        if (!empty($recentMemory['title'])) {
+        if (! empty($recentMemory['title'])) {
             $output .= "**{$recentMemory['title']}**\n";
         }
 
