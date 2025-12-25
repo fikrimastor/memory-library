@@ -3,7 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Actions\Memory\SearchMemoryAction;
-use Illuminate\JsonSchema\JsonSchema;
+use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -15,7 +15,7 @@ class BasicSearchMemory extends Tool
     /**
      * The tool's name.
      */
-    protected string $name = 'search';
+    protected string $name = 'basic-search-memory';
 
     /**
      * The tool's description.
