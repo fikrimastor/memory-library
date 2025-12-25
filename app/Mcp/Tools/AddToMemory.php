@@ -3,7 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Actions\Memory\AddToMemoryAction;
-use Illuminate\JsonSchema\JsonSchema;
+use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -12,6 +12,11 @@ use Throwable;
 
 class AddToMemory extends Tool
 {
+    /**
+     * The tool's name.
+     */
+    protected string $name = 'add-to-memory';
+
     /**
      * The tool's description.
      */

@@ -3,7 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Actions\Memory\GetSpecifiedMemoryAction;
-use Illuminate\JsonSchema\JsonSchema;
+use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Tool;
@@ -13,7 +13,7 @@ class FetchMemory extends Tool
     /**
      * The tool's name.
      */
-    protected string $name = 'fetch';
+    protected string $name = 'fetch-memory';
 
     /**
      * The tool's description.

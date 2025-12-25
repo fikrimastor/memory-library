@@ -3,7 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Actions\Memory\SearchMemoryAction;
-use Illuminate\JsonSchema\JsonSchema;
+use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Log;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -15,7 +15,7 @@ class SearchMemory extends Tool
     /**
      * The tool's name.
      */
-    protected string $name = 'advanced-search';
+    protected string $name = 'advanced-search-memory';
 
     /**
      * The tool's description.
@@ -99,7 +99,7 @@ class SearchMemory extends Tool
     {
         return [
             'query' => $schema->string()->description('The search query')->required(),
-            'limit' => $schema->integer()->description('Maximum number of results to return'),
+            'limit' => $schema->integer()->description('Maximum number of results to return. Minimum: 1, Maximum: 10 (defaults to 10)'),
             'threshold' => $schema->number()->description('Similarity threshold for vector search'),
             'use_embedding' => $schema->boolean()->description('Whether to enable vector search (defaults to true)'),
             'fallback_to_database' => $schema->boolean()->description('Fallback to SQL search when embeddings miss (defaults to true)'),
