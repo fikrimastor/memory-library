@@ -60,6 +60,14 @@ class UserMemory extends Model
             // Dispatch a job to generate the embedding asynchronously
             GenerateEmbeddingJob::dispatch($memory);
         });
+
+        static::updated(function (UserMemory $memory) {
+            // Log the creation with title and tags
+            \Log::info("Memory updated: Title - {$memory->title}, Tags - ".json_encode($memory->tags));
+
+            // Dispatch a job to generate the embedding asynchronously
+            GenerateEmbeddingJob::dispatch($memory);
+        });
     }
 
     /**
@@ -105,7 +113,7 @@ class UserMemory extends Model
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
             'renderer' => [
-                'soft_break' => "<br />",
+                'soft_break' => '<br />',
             ],
             'unordered_list_markers' => ['•', '▪', '▫'],
         ]);
