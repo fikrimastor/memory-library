@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Memory\AddToMemoryAction;
 use App\Actions\Memory\UpdateShareableMemoryStatus;
+use App\Contracts\UpdateMemoryContract;
 use App\Http\Requests\UpdateMemoryRequest;
 use App\Models\UserMemory;
 use Illuminate\Http\JsonResponse;
@@ -105,11 +106,11 @@ class MemoryController extends Controller
         ]);
     }
 
-    public function update(UpdateMemoryRequest $request, UserMemory $memory): RedirectResponse
+    public function update(UpdateMemoryRequest $request, UserMemory $memory, UpdateMemoryContract $action): RedirectResponse
     {
         $this->authorize('update', $memory);
 
-        $memory->update($request->validated());
+        $action->handle($memory, $request->validated());
 
         return Redirect::route('memories.show', $memory)
             ->with('success', 'Memory updated successfully.');
