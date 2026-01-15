@@ -80,12 +80,12 @@ class GenerateEmbeddingJob implements ShouldQueue
     /**
      * The maximum number of unhandled exceptions to allow before failing.
      */
-    public int $maxExceptions = 3;
+    // public int $maxExceptions = 3;
 
     /**
      * The number of seconds the job can run before timing out.
      */
-    public int $timeout = 120;
+    // public int $timeout = 120;
 
     /**
      * Calculate the number of seconds to wait before retrying the job.
