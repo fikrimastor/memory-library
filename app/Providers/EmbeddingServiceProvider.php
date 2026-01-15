@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Actions\Memory\UpdateMemoryAction;
 use App\Contracts\EmbeddingDriverInterface;
-use App\Contracts\UpdateMemoryContract;
 use App\Services\EmbeddingManager;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
@@ -26,9 +24,6 @@ class EmbeddingServiceProvider extends ServiceProvider implements DeferrableProv
 
         // Register the default driver
         $this->app->singleton(EmbeddingDriverInterface::class, fn ($app) => $app[EmbeddingManager::class]->driver());
-
-        // Additional Contract
-        $this->app->singleton(UpdateMemoryContract::class, UpdateMemoryAction::class);
     }
 
     /**
@@ -39,5 +34,16 @@ class EmbeddingServiceProvider extends ServiceProvider implements DeferrableProv
         $this->publishes([
             __DIR__.'/../../config/embedding.php' => config_path('embedding.php'),
         ], 'config');
+    }
+
+    /**
+     * Get the services provided by the provider.
+     */
+    public function provides(): array
+    {
+        return [
+            EmbeddingManager::class,
+            EmbeddingDriverInterface::class,
+        ];
     }
 }
