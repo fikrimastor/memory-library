@@ -27,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
             return view('mcp.authorize', $parameters);
         });
 
+        Passport::tokensExpireIn(now()->addDays(15));
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+
         RateLimiter::for('public-memory', function (Request $request) {
             return Limit::perMinute(100)->by($request->ip());
         });
