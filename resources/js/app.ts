@@ -1,10 +1,15 @@
 import '../css/app.css';
 
-import { createInertiaApp } from '@inertiajs/vue3';
+import axios from 'axios';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
+
+// axios reads XSRF-TOKEN cookie automatically (Inertia v2 recommended)
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.withCredentials = true;
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -23,6 +28,13 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+});
+
+// Automatically reload the page when the session expires (419 CSRF token mismatch)
+router.on('invalid', (event) => {
+    if (event.detail.response.status === 419) {
+        window.location.reload();
+    }
 });
 
 // This will set light / dark mode on page load...
