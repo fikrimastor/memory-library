@@ -33,5 +33,4 @@ yarn-error.log
 CLAUDE.md
 AGENTS.md
 .claude/skills/*
-.github/skills/*
 .agents/skills/*
