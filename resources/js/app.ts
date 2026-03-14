@@ -7,10 +7,6 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
 
-// axios reads XSRF-TOKEN cookie automatically (Inertia v2 recommended)
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.withCredentials = true;
-
 // Reload the page when session expires (419 CSRF / 401 Unauthenticated) for direct axios calls
 axios.interceptors.response.use(
     (response) => response,
