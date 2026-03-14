@@ -58,6 +58,7 @@ class SocialAuthController extends Controller
             if ($socialAccount) {
                 // Log in the existing user
                 Auth::login($socialAccount->user, remember: true);
+                session()->regenerate();
 
                 return redirect()->intended(route('dashboard', absolute: false));
             }
