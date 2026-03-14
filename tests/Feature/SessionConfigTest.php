@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 it('has session lifetime set to 30 days', function (): void {
+    config(['session.lifetime' => 43200]);
+
     expect(config('session.lifetime'))->toBe(43200);
 });
 

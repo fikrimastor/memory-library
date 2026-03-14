@@ -39,15 +39,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 if ($request->expectsJson()) {
                     return response()->json([
                         'message' => 'Your session has expired. Please log in again.',
-                        'token' => 'Your session has expired. Please log in again.',
+                        'code' => 'SESSION_EXPIRED',
                     ], 419);
-                }
-
-                if ($request->header('X-Inertia')) {
-                    return redirect()->route('login')->with([
-                    'token' => 'The page expired, please try again.',
-                        'message' => 'Your session has expired. Please log in again.',
-                    ]);
                 }
 
                 return $response;

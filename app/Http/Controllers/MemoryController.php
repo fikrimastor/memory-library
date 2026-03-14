@@ -10,7 +10,6 @@ use App\Models\UserMemory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -28,7 +27,7 @@ class MemoryController extends Controller
 
         $memoriesQuery->when($query, function ($qBuilder, $search) {
             $qBuilder->where(function ($subQuery) use ($search) {
-                $like = '%' . $search . '%';
+                $like = '%'.$search.'%';
                 $subQuery->where('title', 'like', $like)
                     ->orWhere('thing_to_remember', 'like', $like)
                     ->orWhere('project_name', 'like', $like);
