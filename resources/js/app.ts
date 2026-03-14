@@ -43,7 +43,8 @@ createInertiaApp({
 
 // Automatically reload the page when the session expires (419 CSRF token mismatch)
 router.on('invalid', (event) => {
-    if (event.detail.response.status === 419) {
+    const status = event.detail?.response?.status;
+    if (status === 419) {
         window.location.reload();
     }
 });
