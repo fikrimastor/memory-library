@@ -10,6 +10,7 @@ use App\Models\UserMemory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -23,27 +24,29 @@ class MemoryController extends Controller
         $query = $request->input('search');
         $project = $request->input('project');
 
-        $queryMemories = $user->memories();
+        $allMemories = $user->memories()->orderBy('created_at', 'desc')->get();
 
-        $memories = $queryMemories
-            ->when($query, function ($q, $query) {
-                $q->where(function ($subQuery) use ($query) {
-                    $subQuery->where('title', 'like', "%{$query}%")
-                        ->orWhere('thing_to_remember', 'like', "%{$query}%")
-                        ->orWhere('project_name', 'like', "%{$query}%");
-                });
-            })
-            ->when($project, function ($q, $project) {
-                $q->where('project_name', $project);
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(12)
-            ->withQueryString();
+        $filtered = $allMemories
+            ->when($query, fn ($col, $q) => $col->filter(
+                fn ($m) => str_contains(strtolower((string) $m->title), strtolower($q))
+                    || str_contains(strtolower((string) $m->thing_to_remember), strtolower($q))
+                    || str_contains(strtolower((string) $m->project_name), strtolower($q))
+            ))
+            ->when($project, fn ($col, $p) => $col->filter(fn ($m) => $m->project_name === $p))
+            ->values();
 
-        $projects = $queryMemories
-            ->select('project_name')
-            ->distinct()
-            ->pluck('project_name');
+        $perPage = 12;
+        $currentPage = (int) $request->input('page', 1);
+
+        $memories = new LengthAwarePaginator(
+            $filtered->forPage($currentPage, $perPage),
+            $filtered->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        $projects = $allMemories->pluck('project_name')->filter()->unique()->sort()->values();
 
         return Inertia::render('memories/Index', [
             'memories' => $memories,

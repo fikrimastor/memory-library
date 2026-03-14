@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SocialAccount;
 use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -35,7 +35,7 @@ class SocialAuthController extends Controller
     /**
      * Obtain the user information from GitHub.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function handleProviderCallback()
     {
@@ -57,7 +57,7 @@ class SocialAuthController extends Controller
 
             if ($socialAccount) {
                 // Log in the existing user
-                Auth::login($socialAccount->user);
+                Auth::login($socialAccount->user, remember: true);
 
                 return redirect()->intended(route('dashboard', absolute: false));
             }
@@ -112,7 +112,7 @@ class SocialAuthController extends Controller
                     ],
                 ]);
 
-                Auth::login($existingUser);
+                Auth::login($existingUser, remember: true);
 
                 return redirect()->intended(route('dashboard', absolute: false));
             }
@@ -140,7 +140,7 @@ class SocialAuthController extends Controller
                 ],
             ]);
 
-            Auth::login($user);
+            Auth::login($user, remember: true);
 
             session()->regenerate();
 

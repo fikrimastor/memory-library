@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\CarbonInterval;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -23,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Passport::tokensExpireIn(CarbonInterval::days(1));
+        Passport::refreshTokensExpireIn(CarbonInterval::year());
+        Passport::personalAccessTokensExpireIn(CarbonInterval::year());
         Passport::authorizationView(function ($parameters) {
             return view('mcp.authorize', $parameters);
         });

@@ -11,6 +11,17 @@ import { initializeTheme } from './composables/useAppearance';
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.withCredentials = true;
 
+// Reload the page when session expires (419 CSRF / 401 Unauthenticated) for direct axios calls
+axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 419 || error.response?.status === 401) {
+            window.location.reload();
+        }
+        return Promise.reject(error);
+    },
+);
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-it('has session lifetime set to one month', function (): void {
+it('has session lifetime set to 30 days', function (): void {
     expect(config('session.lifetime'))->toBe(43200);
 });
 
