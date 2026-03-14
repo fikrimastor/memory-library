@@ -1,11 +1,11 @@
 services:
     laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.3'
+            context: ./vendor/laravel/sail/runtimes/8.3
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
-        image: 'sail-8.3/app'
+        image: sail-8.3/app
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -25,6 +25,8 @@ services:
             - mysql
             - redis
             - rustfs
+            - selenium
+            - mailpit
     mysql:
         image: 'mysql:8.4'
         ports:
@@ -66,7 +68,7 @@ services:
             retries: 3
             timeout: 5s
     rustfs:
-        image: 'rustfs/rustfs:0.24.0'
+        image: 'rustfs/rustfs:latest'
         ports:
             - '${FORWARD_RUSTFS_PORT:-9000}:9000'
             - '${FORWARD_RUSTFS_CONSOLE_PORT:-9001}:9001'
@@ -95,6 +97,21 @@ services:
             timeout: 10s
             retries: 3
             start_period: 40s
+    selenium:
+        image: selenium/standalone-chromium
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        volumes:
+            - '/dev/shm:/dev/shm'
+        networks:
+            - sail
+    mailpit:
+        image: 'axllent/mailpit:latest'
+        ports:
+            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - sail
 networks:
     sail:
         driver: bridge
