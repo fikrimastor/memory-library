@@ -112,7 +112,11 @@ class SocialAuthController extends Controller
                     ],
                 ]);
 
+                // Log the user in with a persistent "remember me" cookie for OAuth sign-ins.
                 Auth::login($existingUser, remember: true);
+
+                // Regenerate the session ID after login to prevent session fixation.
+                session()->regenerate();
 
                 return redirect()->intended(route('dashboard', absolute: false));
             }
