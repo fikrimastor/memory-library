@@ -24,29 +24,32 @@ class MemoryController extends Controller
         $query = $request->input('search');
         $project = $request->input('project');
 
-        $allMemories = $user->memories()->orderBy('created_at', 'desc')->get();
+        $memoriesQuery = $user->memories()->orderBy('created_at', 'desc');
 
-        $filtered = $allMemories
-            ->when($query, fn ($col, $q) => $col->filter(
-                fn ($m) => str_contains(strtolower((string) $m->title), strtolower($q))
-                    || str_contains(strtolower((string) $m->thing_to_remember), strtolower($q))
-                    || str_contains(strtolower((string) $m->project_name), strtolower($q))
-            ))
-            ->when($project, fn ($col, $p) => $col->filter(fn ($m) => $m->project_name === $p))
-            ->values();
+        $memoriesQuery->when($query, function ($qBuilder, $search) {
+            $qBuilder->where(function ($subQuery) use ($search) {
+                $like = '%' . $search . '%';
+                $subQuery->where('title', 'like', $like)
+                    ->orWhere('thing_to_remember', 'like', $like)
+                    ->orWhere('project_name', 'like', $like);
+            });
+        });
+
+        $memoriesQuery->when($project, function ($qBuilder, $projectName) {
+            $qBuilder->where('project_name', $projectName);
+        });
 
         $perPage = 12;
-        $currentPage = (int) $request->input('page', 1);
 
-        $memories = new LengthAwarePaginator(
-            $filtered->forPage($currentPage, $perPage),
-            $filtered->count(),
-            $perPage,
-            $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
+        $memories = $memoriesQuery->paginate($perPage)->withQueryString();
 
-        $projects = $allMemories->pluck('project_name')->filter()->unique()->sort()->values();
+        $projects = $user->memories()
+            ->select('project_name')
+            ->whereNotNull('project_name')
+            ->distinct()
+            ->orderBy('project_name')
+            ->pluck('project_name')
+            ->values();
 
         return Inertia::render('memories/Index', [
             'memories' => $memories,
