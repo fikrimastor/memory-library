@@ -1,0 +1,28 @@
+{
+    "agents": [
+        "claude_code",
+        "codex",
+        "opencode",
+        "copilot"
+    ],
+    "guidelines": true,
+    "herd_mcp": false,
+    "mcp": true,
+    "packages": [
+        "inertiajs/inertia-laravel",
+        "laravel/fortify",
+        "laravel/passport",
+        "laravel/socialite"
+    ],
+    "sail": true,
+    "skills": [
+        "mcp-development",
+        "wayfinder-development",
+        "pest-testing",
+        "inertia-vue-development",
+        "tailwindcss-development",
+        "fortify-development",
+        "passport-development",
+        "socialite-development"
+    ]
+}

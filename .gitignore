@@ -30,3 +30,7 @@ yarn-error.log
 .claude/settings.local.json
 .junie
 .serena
+CLAUDE.md
+AGENTS.md
+.claude/skills/*
+.agents/skills/*

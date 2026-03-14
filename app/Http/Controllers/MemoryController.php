@@ -23,27 +23,32 @@ class MemoryController extends Controller
         $query = $request->input('search');
         $project = $request->input('project');
 
-        $queryMemories = $user->memories();
+        $memoriesQuery = $user->memories()->orderBy('created_at', 'desc');
 
-        $memories = $queryMemories
-            ->when($query, function ($q, $query) {
-                $q->where(function ($subQuery) use ($query) {
-                    $subQuery->where('title', 'like', "%{$query}%")
-                        ->orWhere('thing_to_remember', 'like', "%{$query}%")
-                        ->orWhere('project_name', 'like', "%{$query}%");
-                });
-            })
-            ->when($project, function ($q, $project) {
-                $q->where('project_name', $project);
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(12)
-            ->withQueryString();
+        $memoriesQuery->when($query, function ($qBuilder, $search) {
+            $qBuilder->where(function ($subQuery) use ($search) {
+                $like = '%'.$search.'%';
+                $subQuery->where('title', 'like', $like)
+                    ->orWhere('thing_to_remember', 'like', $like)
+                    ->orWhere('project_name', 'like', $like);
+            });
+        });
 
-        $projects = $queryMemories
+        $memoriesQuery->when($project, function ($qBuilder, $projectName) {
+            $qBuilder->where('project_name', $projectName);
+        });
+
+        $perPage = 12;
+
+        $memories = $memoriesQuery->paginate($perPage)->withQueryString();
+
+        $projects = $user->memories()
             ->select('project_name')
+            ->whereNotNull('project_name')
             ->distinct()
-            ->pluck('project_name');
+            ->orderBy('project_name')
+            ->pluck('project_name')
+            ->values();
 
         return Inertia::render('memories/Index', [
             'memories' => $memories,
